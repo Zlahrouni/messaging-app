@@ -1,9 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
+import { Message } from './Message';
+import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
-  @Get()
-  check() {
-    return 'OK';
+  constructor(private readonly healthService: HealthService) {}
+
+  @Post('send')
+  async handleSendMessage(@Body() message: Message) {
+    console.log(message);
+    const result = await this.healthService.sendMessage(message);
+    console.log(`Job added with id: ${result.jobId}`);
+    return 'Message received';
   }
 }
