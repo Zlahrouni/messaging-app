@@ -6,13 +6,10 @@ export class User {
     id: number;
 
     @Field()
-    name: string;
+    id_user_recever : number;
 
     @Field()
-    username: string;
-
-    @Field()
-    password: string;
+    id_user_sender : number;
 
     @Field()
     createdAt: Date;
