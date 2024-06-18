@@ -5,15 +5,18 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserResolver } from './graphql/resolvers/UserResolver';
 import { HealthCheckResolver } from './graphql/resolvers/HealthCheckResolver';
 import { BullModule } from '@nestjs/bull';
-import { RedisModule } from '@nestjs/redis';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { HealthService } from './features/health/health.service';
 import { HealthProcessor } from './features/health/health.processor';
-
+import { CacheController } from './redis/cache.controler';
+import { CacheService } from './redis/cache.service';
+import { redisClientFactory } from './redis/redis.client.factory';
 
 @Module({
   imports: [
     RedisModule.forRoot({
-      url : 'redis://localhost:6379'
+      type: 'single',
+      url: 'redis://localhost:6379',
     }),
     BullModule.forRoot({
       redis: {
@@ -27,14 +30,19 @@ import { HealthProcessor } from './features/health/health.processor';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/schema.gql',
-    })
+    }),
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, CacheController],
   providers: [
     UserResolver,
     HealthCheckResolver,
     HealthService,
-    HealthProcessor 
-  ]
+    HealthProcessor,
+    CacheService,
+    {
+      provide: 'RedisClient',
+      useFactory: redisClientFactory.useFactory,
+    },
+  ],
 })
 export class AppModule {}
