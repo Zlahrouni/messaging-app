@@ -6,13 +6,13 @@ export class User {
     id: number;
 
     @Field()
-    name: string;
+    titre: string;
 
     @Field()
-    username: string;
+    content: string;
 
     @Field()
-    password: string;
+    id_conversation: number;
 
     @Field()
     createdAt: Date;
