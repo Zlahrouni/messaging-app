@@ -7,6 +7,7 @@ import { HealthCheckResolver } from './graphql/resolvers/HealthCheckResolver';
 import { BullModule } from '@nestjs/bull';
 import { HealthService } from './features/health/health.service';
 import { HealthProcessor } from './features/health/health.processor';
+import { HealthResolver } from './graphql/resolvers/Health.resolver';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { HealthProcessor } from './features/health/health.processor';
     UserResolver,
     HealthCheckResolver,
     HealthService,
-    HealthProcessor
+    HealthProcessor,
+    HealthResolver
   ],
 })
 export class AppModule {}

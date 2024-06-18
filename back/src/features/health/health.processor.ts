@@ -1,11 +1,11 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import { Message } from './Message';
+import { MessageDTO } from './message.dto';
 
 @Processor('chat')
 export class HealthProcessor {
   @Process('welcome')
-  async sendMessage(job: Job<Message>) {
+  async sendMessage(job: Job<MessageDTO>) {
     console.log(`sendMessage called with job id: ${job.id}`);
     try {
       const { data } = job;
