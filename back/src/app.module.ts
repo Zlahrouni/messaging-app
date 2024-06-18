@@ -7,9 +7,6 @@ import { HealthCheckResolver } from './graphql/resolvers/HealthCheckResolver';
 import { BullModule } from '@nestjs/bull';
 import { HealthService } from './features/health/health.service';
 import { HealthProcessor } from './features/health/health.processor';
-import { CacheController } from './redis/cache.controler';
-import { CacheService } from './redis/cache.service';
-import { redisClientFactory } from './redis/redis.client.factory';
 
 @Module({
   imports: [
@@ -27,17 +24,12 @@ import { redisClientFactory } from './redis/redis.client.factory';
       autoSchemaFile: 'src/schema.gql',
     }),
   ],
-  controllers: [HealthController, CacheController],
+  controllers: [HealthController],
   providers: [
     UserResolver,
     HealthCheckResolver,
     HealthService,
-    HealthProcessor,
-    CacheService,
-    {
-      provide: 'RedisClient',
-      useFactory: redisClientFactory.useFactory,
-    },
+    HealthProcessor
   ],
 })
 export class AppModule {}
