@@ -6,7 +6,10 @@ export class CacheController {
   constructor(private readonly cacheService: CacheService) {}
 
   @Post()
-  async setCache(@Body('key') key: string, @Body('value') value: string): Promise<void> {
+  async setCache(
+    @Body('key') key: string,
+    @Body('value') value: string,
+  ): Promise<void> {
     await this.cacheService.set(key, value);
   }
 
