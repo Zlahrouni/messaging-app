@@ -1,4 +1,11 @@
 # Projet Messagerie instantané
+
+# Authors (GROUPE 4) :
+- Ziad LAHROUNI
+- Sabrina TAMDA
+- Sara BEVILACQUA
+- Mohamed KERRAZ
+
 ### Introduction :
 Le projet Messagerie instantanée vise à développer une application de communication en temps réel permettant aux utilisateurs d'échanger des messages, partager des fichiers et collaborer. L'utilisation de Nest.js et GraphQL pour ce projet présente des avantages considérables en termes d'architecture, de performance et de flexibilité.
 # 1. Étude de faisabilité
@@ -26,11 +33,5 @@ Nécessité d'un client GraphQL : Les clients doivent utiliser un client GraphQL
 Adoption moins répandue : GraphQL est un langage relativement récent et son adoption n'est pas encore aussi répandue que les API REST.
 # Conclusion :
 L'utilisation de Nest.js et GraphQL pour le projet Messagerie instantanée offre une combinaison puissante pour développer une application performante, flexible et évolutive. Nest.js fournit une structure solide et des fonctionnalités de gestion de dépendances, tandis que GraphQL permet une communication optimisée et une flexibilité accrue pour les API.
-
-# Author :
-- Ziad LAHROUNI
-- Sabrina TAMDA
-- Sara BEVILACQUA
-- Mohamed KERRAZ
 
 
