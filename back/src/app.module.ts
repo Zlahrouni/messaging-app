@@ -5,7 +5,6 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserResolver } from './graphql/resolvers/UserResolver';
 import { HealthCheckResolver } from './graphql/resolvers/HealthCheckResolver';
 import { BullModule } from '@nestjs/bull';
-import { RedisModule } from '@nestjs-modules/ioredis';
 import { HealthService } from './features/health/health.service';
 import { HealthProcessor } from './features/health/health.processor';
 import { CacheController } from './redis/cache.controler';
@@ -14,10 +13,6 @@ import { redisClientFactory } from './redis/redis.client.factory';
 
 @Module({
   imports: [
-    RedisModule.forRoot({
-      type: 'single',
-      url: 'redis://localhost:6379',
-    }),
     BullModule.forRoot({
       redis: {
         host: 'localhost',
