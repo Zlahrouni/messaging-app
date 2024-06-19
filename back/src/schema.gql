@@ -3,8 +3,7 @@
 # ------------------------------------------------------
 
 type User {
-  id: Int!
-  name: String!
+  id: ID!
   username: String!
   password: String!
   createdAt: DateTime!
@@ -16,6 +15,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Query {
-  getUser: User!
-  check: String!
+  getUsers: User!
+}
+
+type Mutation {
+  createUser(userInput: UserInput!): User!
+}
+
+input UserInput {
+  username: String!
+  password: String!
 }
