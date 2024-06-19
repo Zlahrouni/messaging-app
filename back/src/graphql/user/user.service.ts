@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserInput } from './user.dto';
+import { UserInput } from './dto/user.dto';
 import { Redis } from 'ioredis';
 
 @Injectable()

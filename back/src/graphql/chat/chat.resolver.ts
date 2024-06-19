@@ -1,5 +1,5 @@
 import { Resolver } from '@nestjs/graphql';
-import { Chat } from '../models/Chat';
+import { Chat } from './model/Chat';
 import { ChatService } from './chat.service';
 
 @Resolver(() => Chat)

@@ -1,7 +1,7 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { User } from '../models/User';
-import { UserInput } from './user.dto';
+import { User } from './model/User';
+import { UserInput } from './dto/user.dto';
 
 @Resolver(() => User)
 export class UserResolver {

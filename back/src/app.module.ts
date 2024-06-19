@@ -4,7 +4,6 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserResolver } from './graphql/user/user.resolver';
 import { BullModule } from '@nestjs/bull';
 import { RedisModule } from '@nestjs-modules/ioredis';
-import { redisClientFactory } from './redis/redis.client.factory';
 import { UserService } from './graphql/user/user.service';
 
 @Module({
@@ -27,13 +26,6 @@ import { UserService } from './graphql/user/user.service';
       autoSchemaFile: 'src/schema.gql',
     }),
   ],
-  providers: [
-    UserResolver,
-    UserService,
-    {
-      provide: 'RedisClient',
-      useFactory: redisClientFactory.useFactory,
-    },
-  ],
+  providers: [UserResolver, UserService],
 })
 export class AppModule {}
