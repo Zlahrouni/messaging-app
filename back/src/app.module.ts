@@ -7,8 +7,8 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { UserService } from './graphql/user/user.service';
 import { MessageResolver } from './graphql/message/message.resolver';
 import { MessageService } from './graphql/message/message.service';
-import { M } from 'vite/dist/node/types.d-aGj9QkWt';
 import { MessageProcessor } from './graphql/message/message.processor';
+import { ChatService } from './graphql/chat/chat.service';
 
 @Module({
   imports: [
@@ -36,6 +36,7 @@ import { MessageProcessor } from './graphql/message/message.processor';
     MessageResolver,
     MessageService,
     MessageProcessor,
+    ChatService,
   ],
 })
 export class AppModule {}
