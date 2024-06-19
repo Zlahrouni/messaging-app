@@ -4,24 +4,17 @@ import { Queue } from 'bull';
 
 @Injectable()
 export class ChatService {
-  constructor(
-    @InjectQueue('messageSend') private newMessageQueue: Queue,
-    @InjectQueue('messageRecieved') private messageSendQueue: Queue,
-  ) {}
+  constructor(@InjectQueue('messageSend') private newMessageQueue: Queue) {}
 
   async createChat() {
     // create chat logic
-  }
-
-  async sendMessage() {
-    // send message logic
   }
 
   async getChats() {
     // get chats logic
   }
 
-  async processNewMessage() {
-    // process new message logic
+  async getChatById() {
+    // get chat by id logic
   }
 }

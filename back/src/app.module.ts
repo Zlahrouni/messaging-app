@@ -5,6 +5,10 @@ import { UserResolver } from './graphql/user/user.resolver';
 import { BullModule } from '@nestjs/bull';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { UserService } from './graphql/user/user.service';
+import { MessageResolver } from './graphql/message/message.resolver';
+import { MessageService } from './graphql/message/message.service';
+import { M } from 'vite/dist/node/types.d-aGj9QkWt';
+import { MessageProcessor } from './graphql/message/message.processor';
 
 @Module({
   imports: [
@@ -19,13 +23,19 @@ import { UserService } from './graphql/user/user.service';
       },
     }),
     BullModule.registerQueue({
-      name: 'chat',
+      name: 'messageSend',
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/schema.gql',
     }),
   ],
-  providers: [UserResolver, UserService],
+  providers: [
+    UserResolver,
+    UserService,
+    MessageResolver,
+    MessageService,
+    MessageProcessor,
+  ],
 })
 export class AppModule {}

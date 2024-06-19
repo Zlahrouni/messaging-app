@@ -4,14 +4,14 @@ import { MessageService } from './message.service';
 import { MessageInput } from './dto/message.dto';
 
 @Resolver(() => Message)
-export class UserResolver {
+export class MessageResolver {
   // resolver logic
 
   constructor(private readonly messageService: MessageService) {}
 
   @Mutation(() => Message)
-  async createMessage(@Args('messageInput') MessageInput: MessageInput) {
-    return this.messageService.createMessage(MessageInput);
+  async createMessage(@Args('messageInput') messageInput: MessageInput) {
+    return this.messageService.createMessage(messageInput);
   }
 
   @Query(() => [Message])

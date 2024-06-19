@@ -14,15 +14,32 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Message {
+  id: ID!
+  content: String!
+  senderId: ID!
+  receiverId: ID!
+  id_Chat: Float!
+  createdAt: DateTime!
+}
+
 type Query {
   getUsers: [User!]!
+  getMessages: [Message!]!
 }
 
 type Mutation {
   createUser(userInput: UserInput!): User!
+  createMessage(messageInput: MessageInput!): Message!
 }
 
 input UserInput {
   username: String!
   password: String!
+}
+
+input MessageInput {
+  content: String!
+  senderId: String!
+  receiverId: String!
 }
