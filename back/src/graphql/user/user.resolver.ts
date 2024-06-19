@@ -14,7 +14,7 @@ export class UserResolver {
     return this.userService.createUser(UserInput);
   }
 
-  @Query(() => User)
+  @Query(() => [User])
   async getUsers() {
     return this.userService.getUsers();
   }
