@@ -6,8 +6,8 @@ export class MessageInput {
   content: string;
 
   @Field()
-  sender: string;
+  senderId: string;
 
   @Field()
-  receiver: string;
+  receiverId: string;
 }

@@ -1,19 +1,21 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { Message } from './model/Message';
+import { MessageService } from './message.service';
+import { MessageInput } from './dto/message.dto';
 
 @Resolver(() => Message)
-export class UserResolver {
+export class MessageResolver {
   // resolver logic
 
-  constructor(private readonly userService: MessageService) {}
+  constructor(private readonly messageService: MessageService) {}
 
   @Mutation(() => Message)
-  async createUser(@Args('userInput') UserInput: UserInput) {
-    return this.userService.createUser(UserInput);
+  async createMessage(@Args('messageInput') messageInput: MessageInput) {
+    return this.messageService.createMessage(messageInput);
   }
 
   @Query(() => [Message])
-  async getUsers() {
-    return this.userService.getUsers();
+  async getMessages() {
+    return this.messageService.getMessages();
   }
 }
