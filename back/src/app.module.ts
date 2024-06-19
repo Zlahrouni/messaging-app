@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
-import { HealthController } from './features/health/health.controller';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { UserResolver } from './graphql/resolvers/UserResolver';
-import { HealthCheckResolver } from './graphql/resolvers/HealthCheckResolver';
+import { UserResolver } from './graphql/user/user.resolver';
 import { BullModule } from '@nestjs/bull';
-import { HealthService } from './features/health/health.service';
-import { HealthProcessor } from './features/health/health.processor';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { UserService } from './graphql/user/user.service';
 
 @Module({
   imports: [
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
+    }),
     BullModule.forRoot({
       redis: {
         host: 'localhost',
@@ -24,12 +26,6 @@ import { HealthProcessor } from './features/health/health.processor';
       autoSchemaFile: 'src/schema.gql',
     }),
   ],
-  controllers: [HealthController],
-  providers: [
-    UserResolver,
-    HealthCheckResolver,
-    HealthService,
-    HealthProcessor,
-  ],
+  providers: [UserResolver, UserService],
 })
 export class AppModule {}
