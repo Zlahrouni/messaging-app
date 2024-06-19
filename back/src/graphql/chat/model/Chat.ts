@@ -1,10 +1,11 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Message } from './Message';
-import { User } from './User';
+import { Message } from 'src/graphql/message/model/Message';
+import { User } from 'src/graphql/user/model/User';
+
 
 @ObjectType()
 export class Chat {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @Field(() => [User])
