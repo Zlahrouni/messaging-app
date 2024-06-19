@@ -44,8 +44,12 @@ export class ChatService {
 
   async addMessageToChat(chatId: string, message: MessageInput) {
     const chat = await this.getChatById(chatId);
-    chat.messages.push(message);
-    console.log(`Message added to chat: ${chatId}`);
-    await this.redis.set(`chats:${chatId}`, JSON.stringify(chat));
+    if (chat) {
+      chat.messages.push(message);
+      console.log(`Chat: ${JSON.stringify(chat.messages)}`);
+      await this.redis.set(`chats:${chatId}`, JSON.stringify(chat));
+    } else {
+      console.log(`Chat not found: ${chatId}`);
+    }
   }
 }
