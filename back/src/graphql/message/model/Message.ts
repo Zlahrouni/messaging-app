@@ -12,6 +12,9 @@ export class Message {
   @Field(() => User)
   sender: string;
 
+  @Field(() => User)
+  receiver: string;
+
   @Field()
   id_Chat: number;
 
