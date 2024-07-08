@@ -21,7 +21,7 @@ export class MessageService {
 
   async createMessage(data: MessageInput) {
     const chatId = `${data.senderId}:${data.receiverId}`;
-    await this.chatService.createChat(data.senderId, data.receiverId);
+   // await this.chatService.createChat(data.senderId, data.receiverId);
     await this.chatService.addMessageToChat(chatId, data);
     const messageId = Math.random().toString(36).substring(7);
     this.redis.set(`messages: ${messageId}`, JSON.stringify(data));

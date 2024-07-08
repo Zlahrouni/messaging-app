@@ -14,23 +14,57 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type GetUsersResponse {
+  code: Float!
+  message: String!
+  users: [User!]!
+}
+
+type CreateUserResponse {
+  code: Float!
+  message: String!
+  user: User
+}
+
+type SignInResponse {
+  code: Float!
+  message: String!
+  token: String
+}
+
 type Message {
   id: ID!
-  content: String!
   senderId: ID!
   receiverId: ID!
+  content: String!
   id_Chat: Float!
   createdAt: DateTime!
 }
 
-type Query {
-  getUsers: [User!]!
-  getMessages: [Message!]!
+type Chat {
+  id: ID!
+  users: [String!]!
+  createdAt: DateTime!
+  messages: [Message!]!
 }
 
-type Mutation {
-  createUser(userInput: UserInput!): User!
-  createMessage(messageInput: MessageInput!): Message!
+type CreateChatResponse {
+  code: Float!
+  message: String!
+  chat: Chat
+}
+
+type GetChatByUsernameResponse {
+  code: Float!
+  message: String!
+  chat: [Chat!]!
+}
+
+type Query {
+  getUsers: GetUsersResponse!
+  signIn(userInput: UserInput!): SignInResponse!
+  getMessages: [Message!]!
+  getChats(username: String!): GetChatByUsernameResponse!
 }
 
 input UserInput {
@@ -38,8 +72,19 @@ input UserInput {
   password: String!
 }
 
+type Mutation {
+  createUser(userInput: UserInput!): CreateUserResponse!
+  createMessage(messageInput: MessageInput!): Message!
+  createChat(chatInput: ChatInput!): CreateChatResponse!
+}
+
 input MessageInput {
   content: String!
   senderId: String!
   receiverId: String!
+}
+
+input ChatInput {
+  token: String!
+  recipientId: String!
 }

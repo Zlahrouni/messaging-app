@@ -9,6 +9,7 @@ import { MessageResolver } from './graphql/message/message.resolver';
 import { MessageService } from './graphql/message/message.service';
 import { MessageProcessor } from './graphql/message/message.processor';
 import { ChatService } from './graphql/chat/chat.service';
+import {ChatResolver} from "./graphql/chat/chat.resolver";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ChatService } from './graphql/chat/chat.service';
     MessageService,
     MessageProcessor,
     ChatService,
+    ChatResolver
   ],
 })
 export class AppModule {}

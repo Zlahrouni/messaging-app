@@ -7,12 +7,12 @@ export class Chat {
   @Field(() => ID)
   id: string;
 
-  @Field(() => [User])
-  users: User[];
+  @Field(() => [String], { nullable: false })
+  users: string[];
 
   @Field()
   createdAt: Date;
 
-  @Field(() => [Message])
+  @Field(() => [Message], { defaultValue: [] })
   messages: Message[];
 }
