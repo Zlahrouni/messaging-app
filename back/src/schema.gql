@@ -29,7 +29,7 @@ type Message {
   senderId: ID!
   receiverId: ID!
   content: String!
-  id_Chat: Float!
+  chatId: String!
   createdAt: DateTime!
 }
 
@@ -57,7 +57,8 @@ type Mutation {
 }
 
 input MessageInput {
-  content: String!
   senderId: String!
   receiverId: String!
+  chatId: String!
+  content: String!
 }
