@@ -1,10 +1,10 @@
 services:
   db:
     image: postgres:latest
-    container_name: postgres
+    container_name: db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: webprojectdb
     ports:
       - "5432:5432"
