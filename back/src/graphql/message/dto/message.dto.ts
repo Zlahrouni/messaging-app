@@ -2,7 +2,6 @@ import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class MessageInput {
-
   @Field()
   senderId: string;
 
@@ -14,4 +13,7 @@ export class MessageInput {
 
   @Field()
   content: string;
+
+  @Field()
+  createdAt: Date;
 }

@@ -2,28 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  email: String!
-  createdAt: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type GetUsersResponse {
-  code: Float!
-  message: String!
-  users: [User!]!
-}
-
-type CreateUserResponse {
-  code: Float!
-  message: String!
-  user: User
-}
-
 type Message {
   id: ID!
   senderId: ID!
@@ -32,6 +10,11 @@ type Message {
   chatId: String!
   createdAt: DateTime!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Chat {
   id: ID!
@@ -43,6 +26,23 @@ type GetChatsByUsernameResponse {
   code: Float!
   message: String!
   chats: [Chat!]!
+}
+
+type User {
+  email: String!
+  createdAt: DateTime!
+}
+
+type GetUsersResponse {
+  code: Float!
+  message: String!
+  users: [User!]!
+}
+
+type CreateUserResponse {
+  code: Float!
+  message: String!
+  user: User
 }
 
 type Query {
@@ -61,4 +61,5 @@ input MessageInput {
   receiverId: String!
   chatId: String!
   content: String!
+  createdAt: DateTime!
 }

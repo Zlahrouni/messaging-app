@@ -57,6 +57,10 @@ export class MessageService {
     const messageData = await Promise.all(
       messages.map((key) => this.redis.get(key)),
     );
-    return messageData.map((message) => JSON.parse(message!));
+    return messageData.map((message) => {
+      const parsedMessage = JSON.parse(message!);
+      parsedMessage.createdAt = new Date(parsedMessage.createdAt);
+      return parsedMessage;
+    });
   }
 }
