@@ -14,7 +14,7 @@ export class CreateChatResponse {
 }
 
 @ObjectType()
-export class GetChatByUsernameResponse {
+export class GetChatsByUsernameResponse {
     @Field()
     code: number;
 
@@ -22,5 +22,5 @@ export class GetChatByUsernameResponse {
     message: string;
 
     @Field(() => [Chat], {defaultValue: []})
-    chat: Chat;
+    chats: Chat[];
 }

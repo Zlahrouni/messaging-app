@@ -27,14 +27,14 @@ export class ChatService {
    * @throws ConflictException - If the chat already exists.
    */
   async createChat(senderUsername: string, receiverUsername: string) : Promise<Chat> {
-    const sender = await this.userService.getUserByUsername(senderUsername);
-    const receiver = await this.userService.getUserByUsername(receiverUsername);
+    const sender = await this.userService.getUserByEmail(senderUsername);
+    const receiver = await this.userService.getUserByEmail(receiverUsername);
 
     if (!sender || !receiver) {
         throw new NotFoundException('Sender or receiver not found');
     }
 
-    const chat = await this.getChatByUsernames([sender.username, receiver.username]);
+    const chat = await this.getChatByEmails([sender.email, receiver.email]);
 
     if (chat) {
         throw new ConflictException('Chat already exists');
@@ -43,7 +43,7 @@ export class ChatService {
     const chatId = uuidv4();
     const newChat: Chat = {
       id: chatId,
-      users: [sender.username, receiver.username],
+      users: [sender.email, receiver.email],
       createdAt: new Date(),
     };
 
@@ -67,32 +67,22 @@ export class ChatService {
   }
 
   /**
-   * Retrieves a chat by ID.
-   * @param chatId - The ID of the chat.
-   * @returns The chat.
-   */
-  async getChatById(chatId: string) {
-    const chat = await this.redis.get(`chats:${chatId}`);
-    return JSON.parse(chat!);
-  }
-
-  /**
-   * Retrieves a chat by username.
-   * @param username - The username of the user.
+   * Retrieves chats by username.
+   * @param email - The email of the user.
    * @returns A list of chats.
    */
-  async getChatsByUsername(username: string) {
+  async getChatsByEmail(email: string) {
     const chats = await this.getChats();
-    return chats.filter((chat) => chat.users.includes(username));
+    return chats.filter((chat) => chat.users.includes(email));
   }
 
   /**
    * Retrieves a chat by usernames.
-   * @param usernames - The usernames of the users in the chat.
+   * @param emails - The emails of the users.
    * @returns The chat or undefined.
    */
-  async getChatByUsernames(usernames: string[]): Promise<Chat | undefined> {
+  async getChatByEmails(emails: string[]): Promise<Chat | undefined> {
     const chats = await this.getChats();
-    return chats.find((chat) => chat.users.includes(usernames[0]) && chat.users.includes(usernames[1]));
+    return chats.find((chat) => chat.users.includes(emails[0]) && chat.users.includes(emails[1]));
   }
 }

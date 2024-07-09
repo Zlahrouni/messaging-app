@@ -1,13 +1,14 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
 import { Chat } from './model/Chat';
 import { ChatService } from './chat.service';
-import { GetChatByUsernameResponse } from "./chat.response";
-import {getUser} from "../module/auth";
+import { GetChatsByUsernameResponse} from "./chat.response";
+import {verifyOAuthToken} from "../module/auth";
+import {UserService} from "../user/user.service";
 
 
 @Resolver(() => Chat)
 export class ChatResolver {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService, private readonly userService: UserService) {}
 
 
   /**
@@ -15,20 +16,37 @@ export class ChatResolver {
   *  @param token - The token of the user.
    * @returns A response with a status code, message, and a list of chats (nullable).
   */
-  @Query(() => GetChatByUsernameResponse)
-  async getChats(@Args('token') token: string) {
-      const user = getUser(token)
-      if(user == null) {
+  @Query(() => GetChatsByUsernameResponse)
+  async getMyChats(@Args('token') token: string) {
+      try {
+          const email = await verifyOAuthToken(token);
+          let user;
+          if (email) {
+              user = await this.userService.getUserByEmail(email);
+          }
+
+          if (!user) {
+             return {
+                code: 404,
+                message: 'User not found',
+                chats: []
+             }
+          }
+
+          const chats = await this.chatService.getChatsByEmail(user.email);
+
+            return {
+                code: 200,
+                message: 'Success',
+                chats: chats
+            }
+      } catch (e) {
           return {
               code: 401,
               message: 'Unauthorized',
-              chat: null
+              chats: []
           }
+
       }
-      return {
-        code: 200,
-        message: 'Chat retrieved successfully',
-        chat: this.chatService.getChatsByUsername(user.username)
-      };
   }
 }

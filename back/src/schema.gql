@@ -3,9 +3,7 @@
 # ------------------------------------------------------
 
 type User {
-  id: ID!
-  username: String!
-  password: String!
+  email: String!
   createdAt: DateTime!
 }
 
@@ -26,12 +24,6 @@ type CreateUserResponse {
   user: User
 }
 
-type SignInResponse {
-  code: Float!
-  message: String!
-  token: String
-}
-
 type Message {
   id: ID!
   senderId: ID!
@@ -47,26 +39,20 @@ type Chat {
   createdAt: DateTime!
 }
 
-type GetChatByUsernameResponse {
+type GetChatsByUsernameResponse {
   code: Float!
   message: String!
-  chat: [Chat!]!
+  chats: [Chat!]!
 }
 
 type Query {
   getUsers: GetUsersResponse!
-  signIn(userInput: UserInput!): SignInResponse!
   getMessages: [Message!]!
-  getChats(token: String!): GetChatByUsernameResponse!
-}
-
-input UserInput {
-  username: String!
-  password: String!
+  getMyChats(token: String!): GetChatsByUsernameResponse!
 }
 
 type Mutation {
-  createUser(userInput: UserInput!): CreateUserResponse!
+  createUser(email: String!): CreateUserResponse!
   createMessage(messageInput: MessageInput!): Message!
 }
 
