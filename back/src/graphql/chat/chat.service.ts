@@ -1,11 +1,12 @@
-import {ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import Redis from 'ioredis';
-import {MessageInput} from '../message/dto/message.dto';
-import {v4 as uuidv4} from 'uuid';
-import {Chat} from "./model/Chat";
-import {ChatInput} from "./dto/chat.dto";
-import {getUser} from "../module/auth";
-import {UserService} from "../user/user.service";
+import { v4 as uuidv4 } from 'uuid';
+import { Chat } from './model/Chat';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ChatService {
@@ -26,18 +27,24 @@ export class ChatService {
    * @throws NotFoundException - If the sender or receiver is not found.
    * @throws ConflictException - If the chat already exists.
    */
-  async createChat(senderUsername: string, receiverUsername: string) : Promise<Chat> {
+  async createChat(
+    senderUsername: string,
+    receiverUsername: string,
+  ): Promise<Chat> {
     const sender = await this.userService.getUserByUsername(senderUsername);
     const receiver = await this.userService.getUserByUsername(receiverUsername);
 
     if (!sender || !receiver) {
-        throw new NotFoundException('Sender or receiver not found');
+      throw new NotFoundException('Sender or receiver not found');
     }
 
-    const chat = await this.getChatByUsernames([sender.username, receiver.username]);
+    const chat = await this.getChatByUsernames([
+      sender.username,
+      receiver.username,
+    ]);
 
     if (chat) {
-        throw new ConflictException('Chat already exists');
+      throw new ConflictException('Chat already exists');
     }
 
     const chatId = uuidv4();
@@ -93,6 +100,9 @@ export class ChatService {
    */
   async getChatByUsernames(usernames: string[]): Promise<Chat | undefined> {
     const chats = await this.getChats();
-    return chats.find((chat) => chat.users.includes(usernames[0]) && chat.users.includes(usernames[1]));
+    return chats.find(
+      (chat) =>
+        chat.users.includes(usernames[0]) && chat.users.includes(usernames[1]),
+    );
   }
 }
