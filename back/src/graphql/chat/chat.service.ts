@@ -1,11 +1,12 @@
-import {ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import Redis from 'ioredis';
-import {MessageInput} from '../message/dto/message.dto';
-import {v4 as uuidv4} from 'uuid';
-import {Chat} from "./model/Chat";
-import {ChatInput} from "./dto/chat.dto";
-import {getUser} from "../module/auth";
-import {UserService} from "../user/user.service";
+import { v4 as uuidv4 } from 'uuid';
+import { Chat } from './model/Chat';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ChatService {
@@ -31,13 +32,13 @@ export class ChatService {
     const receiver = await this.userService.getUserByEmail(receiverUsername);
 
     if (!sender || !receiver) {
-        throw new NotFoundException('Sender or receiver not found');
+      throw new NotFoundException('Sender or receiver not found');
     }
 
     const chat = await this.getChatByEmails([sender.email, receiver.email]);
 
     if (chat) {
-        throw new ConflictException('Chat already exists');
+      throw new ConflictException('Chat already exists');
     }
 
     const chatId = uuidv4();
@@ -64,6 +65,16 @@ export class ChatService {
       parsedChat.createdAt = new Date(parsedChat.createdAt);
       return parsedChat;
     });
+  }
+
+  /**
+   * Retrieves a chat by ID.
+   * @param chatId - The ID of the chat.
+   * @returns The chat.
+   */
+  async getChatById(chatId: string) {
+    const chat = await this.redis.get(`chats:${chatId}`);
+    return JSON.parse(chat!);
   }
 
   /**
