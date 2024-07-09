@@ -15,7 +15,7 @@ export class GetUsersResponse {
 }
 
 @ObjectType()
-export class CreateUserResponse {
+export class CreateOrSignUserResponse {
     @Field()
     code: number;
 

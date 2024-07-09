@@ -19,18 +19,19 @@ export class UserService {
    * @param email - The email of the user.
    * @throws ConflictException if the email already exists.
    */
-  async createUser(email: string) {
+  async createOrSignUser(email: string) {
     const userExist = await this.getUserByEmail(email)
-
-    if (userExist != null) {
-      throw new ConflictException('Email already exists');
+    if (userExist) {
+      userExist.createdAt = new Date(userExist.createdAt);
+      return userExist;
     }
 
     const newUser: User = {
       email: email,
       createdAt:  new Date(),
     };
-    this.redis.set(`users:${newUser.email}`, JSON.stringify(newUser));
+    await this.redis.set(`users:${newUser.email}`, JSON.stringify(newUser));
+    console.log('this.redis', this.redis.get(`users:${newUser.email}`))
     return newUser;
   }
 

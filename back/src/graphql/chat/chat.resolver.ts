@@ -43,7 +43,7 @@ export class ChatResolver {
       } catch (e) {
           return {
               code: 401,
-              message: 'Unauthorized',
+              message: e.message,
               chats: []
           }
 

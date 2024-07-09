@@ -18,7 +18,7 @@ type GetUsersResponse {
   users: [User!]!
 }
 
-type CreateUserResponse {
+type CreateOrSignUserResponse {
   code: Float!
   message: String!
   user: User
@@ -52,7 +52,7 @@ type Query {
 }
 
 type Mutation {
-  createUser(email: String!): CreateUserResponse!
+  createOrSignUser(email: String!): CreateOrSignUserResponse!
   createMessage(messageInput: MessageInput!): Message!
 }
 
