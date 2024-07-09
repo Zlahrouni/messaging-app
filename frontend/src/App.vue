@@ -36,7 +36,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { onMounted, ref } from "vue";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "vue-router";

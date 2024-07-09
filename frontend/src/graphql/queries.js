@@ -1,22 +1,50 @@
 import { gql } from '@apollo/client';
 
-export const GET_POSTS_QUERY = gql`
-  query GetPosts {
-    getPosts {
-      id
-      title
-      body
-      authorId
-      comments {
+export const GET_CHATS = gql`
+  query GetChats($username: String!) {
+    getChats(username: $username) {
+      code
+      message
+      chat {
         id
-        comment
-        authorId
-      }
-      usersLikes {
-        id
-        userId
+        users
+        createdAt
+        messages {
+          id
+          senderId
+          receiverId
+          content
+          id_Chat
+          createdAt
+        }
       }
     }
   }
 `;
 
+export const GET_MESSAGES = gql`
+  query GetMessages {
+    getMessages {
+      id
+      senderId
+      receiverId
+      content
+      id_Chat
+      createdAt
+    }
+  }
+`;
+
+export const GET_USERS = gql`
+query GetUsers {
+  getUsers {
+    code
+    message
+    users {
+      id
+      username
+      createdAt
+    }
+  }
+}
+`;

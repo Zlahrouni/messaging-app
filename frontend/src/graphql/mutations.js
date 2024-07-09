@@ -5,10 +5,40 @@ export const CREATE_USER = gql`
     createUser(email: $email) {
       code
       message
-      user {
+      email
+    }
+  }
+`;
+
+
+  export const CREATE_MESSAGE = gql`
+    mutation CreateMessage($messageInput: MessageInput!) {
+      createMessage(messageInput: $messageInput) {
+        code
+        message
+        Message{
+          id
+          senderId
+          receiverId
+          content
+          id_Chat
+          createdAt
+        }
+      }
+    }
+  `;
+
+export const CREATE_CHAT = gql`
+  mutation CreateChat($chatInput: ChatInput!) {
+    createChat(chatInput: $chatInput) {
+      code
+      message
+      chat {
         id
-        email
+        token
+        recipientId
       }
     }
   }
 `;
+

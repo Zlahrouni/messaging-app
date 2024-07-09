@@ -1,7 +1,7 @@
 import { createApp, h, provide } from 'vue';
 import App from './App.vue';
-import router from "./router";
-import { initializeApp } from "firebase/app";
+import router from './router';
+import { initializeApp } from 'firebase/app';
 import { ApolloClients } from '@vue/apollo-composable';
 import apolloClient from './apollo/client';
 
@@ -26,5 +26,4 @@ const app = createApp({
 });
 
 app.use(router);
-
 app.mount('#app');

@@ -33,8 +33,14 @@ const register = () => {
   createUserWithEmailAndPassword(getAuth(), email.value, mdp.value)
     .then((result) => {
       console.log("Inscription réussite !");
-      createUser({ email: result.user.email })
-      router.push("/hub");
+      createUser({ email: email.value })
+        .then(response => {
+          console.log(response.data.createUser);
+          router.push("/hub");
+        }).catch(error => {
+          console.log(error);
+          console.error("GraphQL error:", error);
+        });
     })
     .catch((error) => {
       console.log(error.code);  
