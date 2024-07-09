@@ -1,30 +1,45 @@
 <template>
   <div class="view-livechat-container">
-    <div class="livechat-container">
+   
+    <div class="livechat-container" >
       <div>
-        <h1>Bienvenue dans le Hub</h1>
-        <h6>Connecté en tant que : {{ userId }}</h6>
-        <h5>Chat Géneral</h5>
+        <div class="h1">Bienvenue dans le Hub</div>
+        <div class="h6">Connecté en tant que : {{ userId }}</div>
+        <div class="h5">Chat Géneral</div>
+        
       </div>
-        <ul class="messages-container" ref="messagesContainer">
-          <li :class="message.senderId == userId ? 'message message-right' : 'message message-left'" 
-              v-for="message in messages" :key="message.id">
-            <div class="message-info">
-              <div>
-                <p id="user">{{ message.senderId }}</p>
-                <p id="date">{{ message.date }}</p>
-              </div>
-              <div>
-                <p id="text">{{ message.content }}</p>
-              </div>
+
+      <div class="row">
+        <div class="col-sm-3">
+            <h5>Conversation</h5>
+            <div v-for="channel in listchannel">
+              <div class=""> {{ channel }} </div>
+              
             </div>
-          </li>
-        </ul>
-        <div>
-          <textarea autofocus placeholder="Message" v-model="newMessage" @keyup.enter="sendMessage"></textarea>
-          <button ref="scrollContainer" @click="sendMessage">Envoyer</button>
+        </div>
+        <div class="col-sm-9">
+          <ul class="messages-container" ref="messagesContainer">
+            <li :class="message.senderId == userId ? 'message message-right' : 'message message-left'" 
+                v-for="message in messages" :key="message.id">
+              <div class="message-info">
+                <div>
+                  <p id="user">{{ message.senderId }}</p>
+                  <p id="date">{{ message.date }}</p>
+                </div>
+                <div>
+                  <p id="text">{{ message.content }}</p>
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
+      
+      <div>
+        <textarea autofocus placeholder="Message" v-model="newMessage" @keyup.enter="sendMessage"></textarea>
+        <button ref="scrollContainer" @click="sendMessage">Envoyer</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -40,6 +55,7 @@ export default {
       newMessage: "",
       messages: [],
       message: null,
+      listchannel: ["test@gmail","test2@gmail","test3@gmail","test4@gmail"],
       userId: null,
       user: null,
       page: 1,

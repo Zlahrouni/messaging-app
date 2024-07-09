@@ -19,17 +19,21 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { useRouter } from "vue-router";
+import { useMutation } from '@vue/apollo-composable';
+import { CREATE_USER } from './graphql/mutations'; 
 
 const email = ref("");
 const mdp = ref("");
 const msgErr = ref();
 const router = useRouter();
 
+const { mutate: createUser } = useMutation(CREATE_USER);
+
 const register = () => {
   createUserWithEmailAndPassword(getAuth(), email.value, mdp.value)
     .then((result) => {
       console.log("Inscription réussite !");
-      console.log(result.user.email)
+      createUser({ email: result.user.email })
       router.push("/hub");
     })
     .catch((error) => {
@@ -58,6 +62,7 @@ const signInWithGoogle = () => {
   signInWithPopup(getAuth(), provider)
     .then((result) => {
       console.log("Connexion réussite !");
+      console.log(result)
       router.push("/hub");
     })
     .catch((error) => {

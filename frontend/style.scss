@@ -16,8 +16,6 @@
 }
 
 
-
-
 * {
   font-family: "Quicksand";
   font-weight: 400;
@@ -138,9 +136,9 @@ input[type="password"] {
 
 .livechat-container {
   display: grid;
-  gap: 1rem;
+  gap: 3rem;
   width: 50%;
-  grid-template-rows: 10% 90% 10%;
+
 
   textarea {
     resize: none;
