@@ -15,7 +15,7 @@ export class Message {
   content: string;
 
   @Field()
-  id_Chat: number;
+  chatId: string;
 
   @Field()
   createdAt: Date;
