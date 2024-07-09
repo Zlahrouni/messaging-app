@@ -10,6 +10,12 @@ import {CreateUserResponse, GetUsersResponse, SignInResponse} from "./user.respo
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
+  /**
+   * Creates a new user.
+   *
+   * @param userInput - Input data for creating a new user (username & password).
+   * @returns A response with a status code, message, and the created user (nullable).
+   */
   @Mutation(() => CreateUserResponse)
   async createUser(@Args('userInput') userInput: UserInput) {
     try {
@@ -30,6 +36,13 @@ export class UserResolver {
     }
   }
 
+  /**
+   * Retrieves all users.
+   *
+   * @returns A response with a status code, message, and a list of users (nullable).
+   *
+   * DEV NOTE: This method return also password hashable, so you need to retreive only username and id.
+   */
   @Query(() => GetUsersResponse)
   async getUsers(): Promise<GetUsersResponse> {
     try {
@@ -48,6 +61,11 @@ export class UserResolver {
     }
   }
 
+  /**
+   * Sign in a user.
+   * @param userInput - Input data for signing in a user (username & password).
+   * @returns A response with a status code, message, and a token (nullable).
+   */
   @Query(() => SignInResponse)
   async signIn(@Args('userInput') userInput: UserInput) {
 

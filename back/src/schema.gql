@@ -45,13 +45,6 @@ type Chat {
   id: ID!
   users: [String!]!
   createdAt: DateTime!
-  messages: [Message!]!
-}
-
-type CreateChatResponse {
-  code: Float!
-  message: String!
-  chat: Chat
 }
 
 type GetChatByUsernameResponse {
@@ -64,7 +57,7 @@ type Query {
   getUsers: GetUsersResponse!
   signIn(userInput: UserInput!): SignInResponse!
   getMessages: [Message!]!
-  getChats(username: String!): GetChatByUsernameResponse!
+  getChats(token: String!): GetChatByUsernameResponse!
 }
 
 input UserInput {
@@ -75,16 +68,10 @@ input UserInput {
 type Mutation {
   createUser(userInput: UserInput!): CreateUserResponse!
   createMessage(messageInput: MessageInput!): Message!
-  createChat(chatInput: ChatInput!): CreateChatResponse!
 }
 
 input MessageInput {
   content: String!
   senderId: String!
   receiverId: String!
-}
-
-input ChatInput {
-  token: String!
-  recipientId: String!
 }

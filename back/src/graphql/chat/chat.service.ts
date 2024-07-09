@@ -18,22 +18,23 @@ export class ChatService {
     });
   }
 
-  async createChat(chatInput: ChatInput) {
-    const user = getUser(chatInput.token);
+  /**
+   * Creates a new chat.
+   * @param senderUsername - The username of the sender.
+   * @param receiverUsername - The username of the receiver.
+   * @returns The created chat.
+   * @throws NotFoundException - If the sender or receiver is not found.
+   * @throws ConflictException - If the chat already exists.
+   */
+  async createChat(senderUsername: string, receiverUsername: string) : Promise<Chat> {
+    const sender = await this.userService.getUserByUsername(senderUsername);
+    const receiver = await this.userService.getUserByUsername(receiverUsername);
 
-    if (!user) {
-      throw new UnauthorizedException('Unauthorized');
+    if (!sender || !receiver) {
+        throw new NotFoundException('Sender or receiver not found');
     }
 
-    const userIds = await this.userService.getIds()
-
-    if (!userIds.includes(chatInput.recipientId)) {
-      throw new NotFoundException('Receiver not found');
-    }
-
-    const receiver = await this.userService.getUserById(chatInput.recipientId);
-
-    const chat = await this.getChatByUsernames([user.username, receiver.username]);
+    const chat = await this.getChatByUsernames([sender.username, receiver.username]);
 
     if (chat) {
         throw new ConflictException('Chat already exists');
@@ -42,9 +43,8 @@ export class ChatService {
     const chatId = uuidv4();
     const newChat: Chat = {
       id: chatId,
-      users: [user.username, receiver.username],
+      users: [sender.username, receiver.username],
       createdAt: new Date(),
-      messages: [],
     };
 
     await this.redis.set(`chats:${chatId}`, JSON.stringify(newChat));
@@ -52,6 +52,10 @@ export class ChatService {
     return newChat;
   }
 
+  /**
+   * Retrieves all chats.
+   * @returns A list of chats.
+   */
   async getChats() {
     const chats = await this.redis.keys('chats:*');
     const chatData = await Promise.all(chats.map((key) => this.redis.get(key)));
@@ -62,28 +66,32 @@ export class ChatService {
     });
   }
 
+  /**
+   * Retrieves a chat by ID.
+   * @param chatId - The ID of the chat.
+   * @returns The chat.
+   */
   async getChatById(chatId: string) {
     const chat = await this.redis.get(`chats:${chatId}`);
     return JSON.parse(chat!);
   }
 
-  async getChatByUsername(username: string) {
+  /**
+   * Retrieves a chat by username.
+   * @param username - The username of the user.
+   * @returns A list of chats.
+   */
+  async getChatsByUsername(username: string) {
     const chats = await this.getChats();
     return chats.filter((chat) => chat.users.includes(username));
   }
 
-  async addMessageToChat(chatId: string, message: MessageInput) {
-    const chat = await this.getChatById(chatId);
-    if (chat) {
-      chat.messages.push(message);
-      console.log(`Chat: ${JSON.stringify(chat.messages)}`);
-      await this.redis.set(`chats:${chatId}`, JSON.stringify(chat));
-    } else {
-      console.log(`Chat not found: ${chatId}`);
-    }
-  }
-
-  async getChatByUsernames(usernames: string[]) {
+  /**
+   * Retrieves a chat by usernames.
+   * @param usernames - The usernames of the users in the chat.
+   * @returns The chat or undefined.
+   */
+  async getChatByUsernames(usernames: string[]): Promise<Chat | undefined> {
     const chats = await this.getChats();
     return chats.find((chat) => chat.users.includes(usernames[0]) && chat.users.includes(usernames[1]));
   }
