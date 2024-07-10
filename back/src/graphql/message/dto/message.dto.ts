@@ -12,3 +12,12 @@ export class MessageInput {
   content: string;
 
 }
+
+@InputType()
+export class GetMessage {
+  @Field()
+  token: string;
+
+  @Field()
+  chatId: string;
+}

@@ -1,11 +1,11 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { MessageService } from './message.service';
-import { MessageInput } from './dto/message.dto';
+import {GetMessage, MessageInput} from './dto/message.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Message } from './model/Message';
 import { verifyOAuthToken } from '../module/auth';
 import { UserService } from '../user/user.service';
-import {MessageResponse} from "./message.response";
+import {MessageResponse, MessagesResponse} from "./message.response";
 
 @Resolver(() => Message)
 export class MessageResolver {
@@ -76,18 +76,18 @@ export class MessageResolver {
     }
   }
 
-  @Query(() => [Message])
+  @Query(() => MessagesResponse)
   async getMessages(
-    @Args('token') token: string,
-    @Args('chatId') chatId: string,
+    @Args('getMessage') getMessage: GetMessage,
   ) {
     try {
-      const email = await verifyOAuthToken(token);
+      const email = await verifyOAuthToken(getMessage.token);
+
       let user;
       if (email) {
         user = await this.userService.getUserByEmail(email);
       }
-
+      console.log('User', user);
       if (!user) {
         return {
           code: 404,
@@ -95,17 +95,26 @@ export class MessageResolver {
           chats: [],
         };
       }
-
+      const messages : Message[] = await this.messageService.getMessages(getMessage.chatId, user.email);
+      console.log('Messages', messages)
       return {
         code: 200,
         message: 'Messages retrieved successfully',
-        newmessage: await this.messageService.getMessages(chatId),
+        messages: messages,
       };
     } catch (e) {
+      if (e instanceof NotFoundException) {
+        return {
+          code: 404,
+          message: e.message,
+          messages: [],
+        };
+      }
+
       return {
         code: 401,
         message: e.message,
-        chats: [],
+        messages: [],
       };
     }
   }
