@@ -14,18 +14,24 @@ export const GET_CHATS = gql`
   }
 `;
 
-export const GET_MESSAGES = gql`
-  query getMessages($token: String!, $chatId: String!) { 
-    getMessages(token: $token, chatId: $chatId) {
-      id
-      senderEmail
-      receiverEmail
-      content
-      chatId
-      createdAt
+
+  export const GET_MESSAGES = gql`
+    query getMessages($getMessage: GetMessage!) { 
+      getMessages(getMessage: $getMessage) {
+        code
+        message
+        messages {
+          id
+          senderEmail
+          receiverEmail
+          content
+          chatId
+          createdAt
+        }
+      }
     }
-  }
-`;
+  `;
+
 
 export const GET_USERS = gql`
   query GetUsers {

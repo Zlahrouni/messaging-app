@@ -182,15 +182,19 @@ export default {
     async getMessages(chatId) {
 
       const token = localStorage.getItem('token');
-      console.log(token);
-      console.log(chatId);
-      const { data: response } = await client.query({
+
+      const getMessage = {
+          token: token,
+          chatId: chatId
+        };
+
+      console.log(getMessage)
+      const response = await client.query({
           query: GET_MESSAGES, 
-          variables: { token : token, chatId: chatId },
+          variables: {getMessage},
         });
       
-      console.log(response);
-      this.messages = response.getChat.messages;
+      this.messages = response.data.getMessages.messages;
 
     },
     async getUsers() {      
@@ -248,7 +252,7 @@ export default {
       if(this.msgErr){
         alert(this.msgErr);
       }
-      
+      this.getChat();
     },
     scrollToBottom() {
       const container = this.$refs.messagesContainer;
