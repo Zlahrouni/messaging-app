@@ -1,8 +1,8 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
-import { Message } from './model/Message';
 import { MessageService } from './message.service';
 import { MessageInput } from './dto/message.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { Message } from './model/Message';
 
 @Resolver(() => Message)
 export class MessageResolver {

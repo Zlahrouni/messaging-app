@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { UserResolver } from './graphql/user/user.resolver';
 import { BullModule } from '@nestjs/bull';
 import { RedisModule } from '@nestjs-modules/ioredis';
-import { UserService } from './graphql/user/user.service';
 import { MessageResolver } from './graphql/message/message.resolver';
 import { MessageService } from './graphql/message/message.service';
 import { MessageProcessor } from './graphql/message/message.processor';
 import { ChatService } from './graphql/chat/chat.service';
 import { ChatResolver } from './graphql/chat/chat.resolver';
+import { UserResolver } from './graphql/user/user.resolver';
+import { UserService } from './graphql/user/user.service';
 
 @Module({
   imports: [

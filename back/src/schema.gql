@@ -2,10 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Message {
   id: ID!
-  username: String!
-  password: String!
+  senderId: ID!
+  receiverId: ID!
+  content: String!
+  chatId: String!
   createdAt: DateTime!
 }
 
@@ -13,6 +15,23 @@ type User {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type Chat {
+  id: ID!
+  users: [String!]!
+  createdAt: DateTime!
+}
+
+type CreateOrSignUserResponse {
+  code: Float!
+  message: String!
+  chats: [Chat!]!
+}
+
+type User {
+  email: String!
+  createdAt: DateTime!
+}
 
 type GetUsersResponse {
   code: Float!
@@ -26,47 +45,14 @@ type CreateUserResponse {
   user: User
 }
 
-type SignInResponse {
-  code: Float!
-  message: String!
-  token: String
-}
-
-type Message {
-  id: ID!
-  senderId: ID!
-  receiverId: ID!
-  content: String!
-  chatId: String!
-  createdAt: DateTime!
-}
-
-type Chat {
-  id: ID!
-  users: [String!]!
-  createdAt: DateTime!
-}
-
-type GetChatByUsernameResponse {
-  code: Float!
-  message: String!
-  chat: [Chat!]!
-}
-
 type Query {
   getUsers: GetUsersResponse!
-  signIn(userInput: UserInput!): SignInResponse!
   getMessages: [Message!]!
-  getChats(token: String!): GetChatByUsernameResponse!
-}
-
-input UserInput {
-  username: String!
-  password: String!
+  getMyChats(token: String!): GetChatsByUsernameResponse!
 }
 
 type Mutation {
-  createUser(userInput: UserInput!): CreateUserResponse!
+  createOrSignUser(email: String!): CreateOrSignUserResponse!
   createMessage(messageInput: MessageInput!): Message!
 }
 

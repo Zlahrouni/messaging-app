@@ -1,18 +1,11 @@
 import * as bcrypt from "bcrypt";
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import {FireBaseAdmin} from "./firebaseAdmin";
 
 dotenv.config();
 export type JWTUser = {
-    id: string;
-    username: string;
-};
-
-export const createJWT = (user: JWTUser) => {
-    return jwt.sign(
-        { id: user.id, username: user.username },
-        process.env.JWT_SECRET as string
-    );
+    email: string;
 };
 
 export const getUser = (token: string) => {
@@ -23,13 +16,11 @@ export const getUser = (token: string) => {
     }
 };
 
-export const comparePasswords = (
-    password: string,
-    hash: string
-): Promise<boolean> => {
-    return bcrypt.compare(password, hash);
-};
-
-export const hashPassword = (password: string): Promise<string> => {
-    return bcrypt.hash(password, 5);
-};
+/**
+ * Verify if the token is valid and return the email
+ * @param token
+ */
+export const verifyOAuthToken = async (token: string) => {
+    const decoded = await FireBaseAdmin.auth().verifyIdToken(token);
+    return decoded.email;
+}
