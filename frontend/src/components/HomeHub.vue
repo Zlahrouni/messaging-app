@@ -18,7 +18,7 @@
           style="height: 50vh; 
           border: 5px solid black;
           border-radius: 5px;">
-            <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+            <a class="d-flex justify-content-around align-items-center p-3 link-body-emphasis text-decoration-none ">
               <span class="fs-5 fw-semibold">Conversation </span>
               <div class="dropdown">
                 <button class="btn btn-primary rounded-circle " 
@@ -38,7 +38,7 @@
                 <button @click="selectChat(chat)">
                   <div v-for="useremail in chat.users">
                       <div class="text-center" v-if="useremail != userId">
-                        {{ useremail }}
+                        {{ useremail || "No user foundS" }}
 
                     </div>
                   </div>
@@ -56,8 +56,8 @@
                 v-for="message in messages" :key="message.id">
               <div class="message-info">
                 <div>
-                  <p id="user">{{ message.senderEmail }}</p>
-                  <p id="date">{{ message.createdAt }}</p>
+                  <div id="user">{{ message.senderEmail }}</div>
+                  <div id="date">{{ message.createdAt }}</div>
                 </div>
                 <div>
                   <p id="text">{{ message.content }}</p>
@@ -79,8 +79,6 @@
 
 <script>
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { format } from "date-fns";
-import { useMutation, useQuery  } from '@vue/apollo-composable';
 import { GET_CHATS, GET_USERS } from './../graphql/queries';
 import { CREATE_MESSAGE } from './../graphql/mutations'; 
 import client from "../apollo/client";
@@ -159,14 +157,11 @@ export default {
       this.chats.push(
         { id : email,
           users: [email]
-
         })
     },
 
     async getChat() {
       const token = localStorage.getItem('token');
-
-      console.log(token)
 
       const { data: response } = await client.query({
           query: GET_CHATS, 
@@ -211,8 +206,6 @@ export default {
             variables: {messageInput},
           });
 
-
-          console.log(response)
           const newMessage = {
             content: response.data.createMessage.messageCreated.content,
             senderEmail: response.data.createMessage.messageCreated.senderEmail,
