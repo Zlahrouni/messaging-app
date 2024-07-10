@@ -52,11 +52,11 @@
         <div class="col-sm-9">
 
           <ul class="messages-container" ref="messagesContainer" >
-            <li :class="message.senderId == userId ? 'message message-right' : 'message message-left'" 
+            <li :class="message.senderEmail == userId ? 'message message-right' : 'message message-left'" 
                 v-for="message in messages" :key="message.id">
               <div class="message-info">
                 <div>
-                  <p id="user">{{ message.senderId }}</p>
+                  <p id="user">{{ message.senderEmail }}</p>
                   <p id="date">{{ message.createdAt }}</p>
                 </div>
                 <div>
@@ -85,6 +85,9 @@ import { GET_CHATS, GET_USERS } from './../graphql/queries';
 import { CREATE_MESSAGE } from './../graphql/mutations'; 
 import client from "../apollo/client";
 
+
+
+
 export default {
   name: 'Hub',
   data() {
@@ -94,31 +97,7 @@ export default {
       message: null,
       selectedChatEmail: null,
       chatId: null,
-      chats: [
-        {id: 1, users: ["mohamedreda.kerraz@gmail.com", "inconnu1"], 
-          messages: [
-            {id: 1, senderId: "inconnu1", content: "yo salut", id_Chat: 1}, 
-            {id: 2, senderId: "mohamedreda.kerraz@gmail.com", content: "sa va", id_Chat: 1}
-          ]
-        }, 
-        {id: 2, users: ["mohamedreda.kerraz@gmail.com", "inconnu2"], 
-          messages: [
-            {id: 1, senderId: "mohamedreda.kerraz@gmail.com", content: "tu es la ? ", id_Chat: 2}, 
-            {id: 2, senderId: "inconnu2", content: "oui et toi", id_Chat: 2}
-          ]
-        },
-        {id: 3, users: ["mohamedreda.kerraz@gmail.com", "inconnu3"], 
-          messages: [
-            {id: 1, senderId: "inconnu3", content: "tu joue ?", id_Chat: 3}, 
-            {id: 2, senderId: "mohamedreda.kerraz@gmail.com", content: "oui j'arrive", id_Chat: 3}
-          ]
-        }, 
-        {id: 4, users: ["mohamedreda.kerraz@gmail.com", "inconnu4"], 
-          messages: [
-            {id: 1, senderId: "inconnu4",content: "tu dort ?", id_Chat: 4}, 
-          ]
-        }, 
-      ],
+      chats: [],
       userId: null,
       user: null,
       usersByEmail: [],
@@ -193,6 +172,7 @@ export default {
           query: GET_CHATS, 
           variables: { token : token },
         });
+        console.log(response);
         let get_chat = response.getMyChats.chats;
         if(get_chat.length > 0){
           get_chat.forEach(new_chat => {
@@ -215,39 +195,44 @@ export default {
     },
     async sendMessage() {
       if (this.newMessage.trim() !== "" && this.userId && this.selectedChatEmail) {
-        const now = new Date();
-        const formattedDate = format(now, "dd/MM/yyyy HH:mm");
+ 
         const token = localStorage.getItem('token');
 
         const messageInput = {
           content: this.newMessage,
-          senderId: this.userId,
-          receiverId: this.selectedChatEmail,
-          chatId: this.chatId || null,
-          createdAt: formattedDate,
+          receiveirEmail: this.selectedChatEmail,
           token: token
         };
+        
+       try {
 
-        // try {
-
-          const { response } = await client.mutate({
+          const response = await client.mutate({
             mutation: CREATE_MESSAGE, 
-            variables: { messageInput },
+            variables: {messageInput},
           });
 
 
-          console.log(response);
-          this.messages.push(messageInput);
+          console.log(response)
+          const newMessage = {
+            content: response.data.createMessage.messageCreated.content,
+            senderEmail: response.data.createMessage.messageCreated.senderEmail,
+            receiverEmail: response.data.createMessage.messageCreated.receiverEmail,
+            chatId: response.data.createMessage.messageCreated.chatId,
+            createdAt: response.data.createMessage.messageCreated.createdAt
+          };
+          
+
+          this.messages.push(newMessage);
           this.newMessage = "";
 
           this.$nextTick(() => {
             this.scrollToBottom();
           });
-        // } catch (error) {
-        //   console.error("GraphQL error:", error);
-        //   this.msgErr = "Erreur lors de l'envoi du message";
+        } catch (error) {
+          console.error("GraphQL error:", error);
+           this.msgErr = "Erreur lors de l'envoi du message";
           
-        // }
+        }
       }
       if(this.msgErr){
         alert(this.msgErr);

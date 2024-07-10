@@ -19,10 +19,10 @@ export const CREATE_USER = gql`
       createMessage(messageInput: $messageInput) {
         code
         message
-        Message {
+        messageCreated {
           id
-          senderId
-          receiverId
+          senderEmail
+          receiverEmail
           content
           chatId
           createdAt
