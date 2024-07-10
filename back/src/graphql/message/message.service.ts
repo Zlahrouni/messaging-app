@@ -4,6 +4,8 @@ import { MessageInput } from './dto/message.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { ChatService } from '../chat/chat.service';
+import { v4 as uuidv4 } from 'uuid';
+import { Message } from './model/Message';
 
 @Injectable()
 export class MessageService {
@@ -20,24 +22,33 @@ export class MessageService {
   }
 
   async createMessage(data: MessageInput) {
-    const chatId = `${data.senderId}:${data.receiverId}`;
-   // await this.chatService.createChat(data.senderId, data.receiverId);
-    await this.chatService.addMessageToChat(chatId, data);
-    const messageId = Math.random().toString(36).substring(7);
-    this.redis.set(`messages: ${messageId}`, JSON.stringify(data));
-    const job = await this.messageSend.add('newMessage', data);
-    console.log(`Job added: ${job.id}`);
-    return {
+    let chat = await this.chatService.getChatById(data.chatId);
+
+    if (!chat) {
+      chat = await this.chatService.createChat(data.senderId, data.receiverId);
+    }
+
+    const newMessage: Message = {
+      id: uuidv4(),
+      chatId: data.chatId,
+      content: data.content,
       senderId: data.senderId,
       receiverId: data.receiverId,
-      content: data.content,
+      createdAt: new Date(),
     };
+
+    await this.messageSend.add('send', newMessage);
+    const job = await this.messageSend.add('newMessage', newMessage);
+    console.log(`Message added to queue: ${job.id}`);
+
+    await this.redis.set(`messages:${newMessage}`, JSON.stringify(data));
+    return newMessage;
   }
 
   async processNewMessage(data: MessageInput) {
-    const { content, senderId, receiverId } = data;
+    const { content, senderId, chatId } = data;
     console.log(
-      `New message sent : ${content}, from: ${senderId} to ${receiverId}`,
+      `New message sent : ${content}, from: ${senderId} in ${chatId}`,
     );
   }
 
@@ -46,6 +57,10 @@ export class MessageService {
     const messageData = await Promise.all(
       messages.map((key) => this.redis.get(key)),
     );
-    return messageData.map((message) => JSON.parse(message!));
+    return messageData.map((message) => {
+      const parsedMessage = JSON.parse(message!);
+      parsedMessage.createdAt = new Date(parsedMessage.createdAt);
+      return parsedMessage;
+    });
   }
 }

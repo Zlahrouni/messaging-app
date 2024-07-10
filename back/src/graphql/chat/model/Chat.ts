@@ -13,6 +13,4 @@ export class Chat {
   @Field()
   createdAt: Date;
 
-  @Field(() => [Message], { defaultValue: [] })
-  messages: Message[];
 }

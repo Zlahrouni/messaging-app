@@ -1,9 +1,6 @@
 import {ConflictException, Injectable} from '@nestjs/common';
-import {UserInput} from './dto/user.dto';
 import {Redis} from 'ioredis';
-import {v4 as uuidv4} from 'uuid';
 import {User} from "./model/User";
-import {comparePasswords, createJWT, hashPassword} from "../module/auth";
 
 @Injectable()
 export class UserService {
@@ -16,62 +13,56 @@ export class UserService {
     });
   }
 
-  async createUser(userdto: UserInput) {
-    const userExist = await this.redis.get(`username:${userdto.username}`)
-
-    if (userExist != null) {
-      throw new ConflictException('Username already exists')
+  /**
+   * Creates a new user.
+   * @returns The created user.
+   * @param email - The email of the user.
+   * @throws ConflictException if the email already exists.
+   */
+  async createOrSignUser(email: string) {
+    const userExist = await this.getUserByEmail(email)
+    if (userExist) {
+      userExist.createdAt = new Date(userExist.createdAt);
+      return userExist;
     }
 
     const newUser: User = {
-      id: uuidv4(),
-      username: userdto.username,
-      password: await hashPassword(userdto.password),
+      email: email,
       createdAt:  new Date(),
     };
-    this.redis.set(`users:${newUser.id}`, JSON.stringify(newUser));
-    this.redis.set(`username:${newUser.username}`, newUser.id);
-
+    await this.redis.set(`users:${newUser.email}`, JSON.stringify(newUser));
+    console.log('this.redis', this.redis.get(`users:${newUser.email}`))
     return newUser;
   }
 
-  async getUsers() {
+  /**
+   * Retrieves all users.
+   * @returns A list of users (can be empty).
+   */
+  async getUsers(): Promise<User[]> {
     const users = await this.redis.keys('users:*');
     const userData = await Promise.all(users.map((key) => this.redis.get(key)));
     return userData.map((user) => {
-      const parsedUser = JSON.parse(user!);
-      // !Import! Convert date back to a Date object
+      const parsedUser : User = JSON.parse(user!);
+      // !Important! Convert date back to a Date object
       parsedUser.createdAt = new Date(parsedUser.createdAt);
       return parsedUser;
     });
   }
 
-  async getIds() {
-    const userIDs = await this.redis.keys('users:*');
-    return userIDs.map((key) => key.split(':')[1]);
+  /**
+   * Retrieves a user by email.
+   * @param email - The email of the user.
+   * @returns The user with the given email or null if no user was found.
+   */
+  async getUserByEmail(email: string) : Promise<User | null> {
+    const users = await this.redis.keys('users:*');
+    const userData = await Promise.all(users.map((key) => this.redis.get(key)));
+    const user = userData.find((user) => {
+      const parsedUser : User = JSON.parse(user!);
+      return parsedUser.email === email;
+    });
+    return user ? JSON.parse(user) : null;
   }
 
-  async signIn(userInput: UserInput) {
-    const userId = await this.redis.get(`username:${userInput.username}`);
-    if (userId == null) {
-      throw new ConflictException('Invalid username or password');
-    }
-
-    const user = await this.redis.get(`users:${userId}`);
-
-    if (user == null) {
-      throw new ConflictException('Invalid username or password');
-    }
-    const userObj = JSON.parse(user) as User;
-    if (!await comparePasswords(userInput.password, userObj.password)) {
-      throw new ConflictException('Invalid username or password');
-    }
-
-    return createJWT({id: userObj.id, username: userObj.username});
-  }
-
-  async getUserById(userId: string) {
-    const user = await this.redis.get(`users:${userId}`);
-    return JSON.parse(user!);
-  }
 }
