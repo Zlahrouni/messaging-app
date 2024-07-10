@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+  import { gql } from '@apollo/client';
 
 export const GET_CHATS = gql`
   query getMyChats($token: String!) {
@@ -15,11 +15,11 @@ export const GET_CHATS = gql`
 `;
 
 export const GET_MESSAGES = gql`
-  query GetMessages {
-    getMessages {
+  query getMessages($token: String!, $chatId: String!) { 
+    getMessages(token: $token, chatId: $chatId) {
       id
-      senderId
-      receiverId
+      senderEmail
+      receiverEmail
       content
       chatId
       createdAt
@@ -28,14 +28,14 @@ export const GET_MESSAGES = gql`
 `;
 
 export const GET_USERS = gql`
-query GetUsers {
-  getUsers {
-    code
-    message
-    users {
-      email
-      createdAt
+  query GetUsers {
+    getUsers {
+      code
+      message
+      users {
+        email
+        createdAt
+      }
     }
   }
-}
-`;
+  `;

@@ -79,7 +79,7 @@
 
 <script>
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { GET_CHATS, GET_USERS } from './../graphql/queries';
+import { GET_CHATS, GET_USERS, GET_MESSAGES } from './../graphql/queries';
 import { CREATE_MESSAGE } from './../graphql/mutations'; 
 import client from "../apollo/client";
 
@@ -148,6 +148,9 @@ export default {
         }
       });
 
+
+      
+      this.getMessages(chat.id);
       this.messages = chat.messages || [];
       
     },
@@ -167,13 +170,28 @@ export default {
           query: GET_CHATS, 
           variables: { token : token },
         });
-        console.log(response);
+
         let get_chat = response.getMyChats.chats;
+
         if(get_chat.length > 0){
           get_chat.forEach(new_chat => {
             this.chats.push(new_chat)
           });
         }
+    },
+    async getMessages(chatId) {
+
+      const token = localStorage.getItem('token');
+      console.log(token);
+      console.log(chatId);
+      const { data: response } = await client.query({
+          query: GET_MESSAGES, 
+          variables: { token : token, chatId: chatId },
+        });
+      
+      console.log(response);
+      this.messages = response.getChat.messages;
+
     },
     async getUsers() {      
       const { data: response } = await client.query({
