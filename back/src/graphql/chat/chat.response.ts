@@ -1,5 +1,6 @@
-import {Field, ObjectType} from "@nestjs/graphql";
+import {Field, ID, ObjectType} from "@nestjs/graphql";
 import {Chat} from "./model/Chat";
+import {Column, PrimaryGeneratedColumn} from "typeorm";
 
 @ObjectType()
 export class CreateChatResponse {
@@ -21,6 +22,21 @@ export class GetChatsByUsernameResponse {
     @Field()
     message: string;
 
-    @Field(() => [Chat], {defaultValue: []})
-    chats: Chat[];
+    @Field(() => [ChatDto], {defaultValue: []})
+    chats: ChatDto[];
+}
+
+@ObjectType()
+export class ChatDto {
+    @Field(() => ID)
+    id: string;
+
+    @Field(() => [String], { nullable: false })
+    users: string[];
+
+    @Field()
+    lastMessage: string;
+
+    @Field()
+    createdAt: Date;
 }

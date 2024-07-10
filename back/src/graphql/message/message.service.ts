@@ -63,4 +63,11 @@ export class MessageService {
       return parsedMessage;
     });
   }
+
+  async getMyLastMessages(email: string) {
+    const messages = await this.getMessages();
+    const myMessage=  messages.filter((message) => message.senderId === email && message.receiverId === email);
+    
+
+  }
 }
