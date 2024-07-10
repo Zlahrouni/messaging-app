@@ -72,7 +72,7 @@ export class MessageService {
     }
   }
 
-  async getMessages(chatId: string) {
+  async getMessages(chatId: string): Promise<Message[]> {
     const messagesKeys = await this.redis.keys(`messages: ${chatId}:*`);
 
     if (messagesKeys.length > 0) {
@@ -92,10 +92,4 @@ export class MessageService {
     }
   }
 
-  async getMyLastMessages(email: string) {
-    const messages = await this.getMessages('gggg');
-    const myMessage = messages.filter(
-      (message) => message.senderId === email && message.receiverId === email,
-    );
-  }
 }
