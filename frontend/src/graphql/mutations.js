@@ -1,11 +1,14 @@
 import { gql } from '@apollo/client/core';
 
 export const CREATE_USER = gql`
-  mutation CreateUser($email: String!) {
-    createUser(email: $email) {
+  mutation createOrSignUser($email: String!) {
+    createOrSignUser(email: $email) {
       code
       message
-      email
+      user{
+        email
+        createdAt
+      }
     }
   }
 `;

@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { initializeApp } from 'firebase/app';
 import { ApolloClients } from '@vue/apollo-composable';
-import apolloClient from './apollo/client';
+import client from './apollo/client';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,8 +18,9 @@ initializeApp(firebaseConfig);
 
 const app = createApp({
   setup() {
+
     provide(ApolloClients, {
-      default: apolloClient,
+      default: client,
     });
   },
   render: () => h(App),

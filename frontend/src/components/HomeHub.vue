@@ -68,6 +68,7 @@ import { format } from "date-fns";
 import { useMutation, useQuery  } from '@vue/apollo-composable';
 import { GET_CHATS } from './../graphql/queries';
 import { CREATE_MESSAGE } from './../graphql/mutations'; 
+import client from "../apollo/client";
 
 export default {
   name: 'Hub',
@@ -104,20 +105,21 @@ export default {
       ],
       userId: null,
       user: null,
-
+      token: null,
       hasMore: true,
       SERVER_PORT: import.meta.env.VITE_BACKEND_PORT || 3000,
     };
   },
   mounted() {
     this.initUser();
-    this.scrollToBottom()
+    this.scrollToBottom();
+    
   },
   updated() {
     this.scrollToBottom();
   },
   created() {
-   this.getData();
+   this.getChat();
   },
   methods: {
     initUser() {
@@ -146,6 +148,7 @@ export default {
           this.userId = null;
         }
       });
+      
     },
     selectChat(chat) {
       this.selectedChatId = chat.id;
@@ -153,26 +156,23 @@ export default {
       this.messages = chat.messages;
       
     },
-    async getData() {
-      const { result, loading, error } = useQuery(GET_CHATS, { username: this.userId });
 
-      if (error.value || result.value == undefined) {
-        console.error('GraphQL error:', error.value);
-        this.msgErr = "Erreur lors de la récupération des chats";
-      } else {
-       
-        result.value.then(data => {
-          this.chats = data.getChats.chat;
-          
-          if (this.chats.length > 0) {
-           
-            this.selectChat(this.chats[0]);
-          }
-        }).catch(err => {
-          console.error('Error fetching chats:', err);
-          this.msgErr = "Erreur lors de la récupération des chats";
+    async getChat() {
+      const token = localStorage.getItem('token');
+      
+
+      const { data: response } = await client.query({
+          query: GET_CHATS,
+          variables: { token : token },
         });
-      }
+
+      console.log(response)
+
+
+
+
+
+
     },
     async sendMessage() {
       if (this.newMessage.trim() !== "" && this.userId && this.selectedChatId) {
@@ -188,10 +188,15 @@ export default {
         this.messages.push(message);
         this.newMessage = "";
         try {
-          const { mutate: createMessage } = useMutation(CREATE_MESSAGE);
+
+          const { mutate: createMessage } = useMutation(CREATE_MESSAGE, {
+            client: client,
+          });
+
+
           const response = await createMessage({ message });
 
-          console.log(response.data.createMessage.Message);
+ 
          
           this.newMessage = "";
           this.$nextTick(() => {

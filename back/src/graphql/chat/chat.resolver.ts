@@ -20,6 +20,7 @@ export class ChatResolver {
   async getMyChats(@Args('token') token: string) {
       try {
           const email = await verifyOAuthToken(token);
+
           let user;
           if (email) {
               user = await this.userService.getUserByEmail(email);

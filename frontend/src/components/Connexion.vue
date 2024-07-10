@@ -20,18 +20,34 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { useRouter } from "vue-router";
+import { useMutation } from '@vue/apollo-composable';
+import { CREATE_USER } from './../graphql/mutations'; 
+import client from "../apollo/client";
 
 const email = ref("");
 const mdp = ref("");
 const msgErr = ref();
 const router = useRouter();
 
+const { mutate: createUser } = useMutation(CREATE_USER, {
+    client: client
+});
+
 const login = () => {
   signInWithEmailAndPassword(getAuth(), email.value, mdp.value)
     .then((result) => {
-      console.log(result);
-      console.log("Connexion réussite !");
-      router.push("/hub");
+
+      createUser({ email: email.value })
+        .then(response => {
+          if(response.data.createOrSignUser.code == 200){
+            console.log("Inscription réussite !");
+            router.push("/hub");
+          }
+        }).catch(error => {
+          console.log(error);
+          console.error("GraphQL error:", error);
+        });
+
     })
     .catch((error) => {
       switch (error.code) {
@@ -56,9 +72,19 @@ const signInWithGoogle = () => {
 
   signInWithPopup(getAuth(), provider)
     .then((result) => {
-      console.log("Connexion réussite !");
-      console.log(result);
-      router.push("/hub");
+
+      createUser({ email: email.value })
+        .then(response => {
+          console.log(response);
+          if(response.data.createOrSignUser.code == 200){
+            console.log("Inscription réussite !");
+            router.push("/hub");
+          }
+        }).catch(error => {
+          console.log(error);
+          console.error("GraphQL error:", error);
+        });
+
     })
     .catch((error) => {
       switch (error.code) {
