@@ -4,12 +4,16 @@ import { MessageInput } from './dto/message.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Message } from './model/Message';
 import { verifyOAuthToken } from '../module/auth';
+import { UserService } from '../user/user.service';
 
 @Resolver(() => Message)
 export class MessageResolver {
   // resolver logic
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly userService: UserService,
+  ) {}
 
   @Mutation(() => Message)
   async createMessage(@Args('messageInput') messageInput: MessageInput) {
@@ -53,11 +57,36 @@ export class MessageResolver {
   }
 
   @Query(() => [Message])
-  async getMessages() {
-    return {
-      code: 200,
-      message: 'Messages retrieved successfully',
-      newmessage: await this.messageService.getMessages(),
-    };
+  async getMessages(
+    @Args('token') token: string,
+    @Args('chatId') chatId: string,
+  ) {
+    try {
+      const email = await verifyOAuthToken(token);
+      let user;
+      if (email) {
+        user = await this.userService.getUserByEmail(email);
+      }
+
+      if (!user) {
+        return {
+          code: 404,
+          message: 'User not found',
+          chats: [],
+        };
+      }
+
+      return {
+        code: 200,
+        message: 'Messages retrieved successfully',
+        newmessage: await this.messageService.getMessages(chatId),
+      };
+    } catch (e) {
+      return {
+        code: 401,
+        message: e.message,
+        chats: [],
+      };
+    }
   }
 }
