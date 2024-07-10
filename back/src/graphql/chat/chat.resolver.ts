@@ -38,7 +38,7 @@ export class ChatResolver {
 
       const chats = await this.chatService.getChatsByEmail(user.email);
 
-      const chatDtos = this.chatService.getLastMessageOfChats(chats);
+      const chatDtos = await this.chatService.getLastMessageOfChats(chats);
 
       console.log('Chat DTOs', chatDtos)
       return {

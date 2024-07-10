@@ -3,7 +3,6 @@ import Redis from 'ioredis';
 import {v4 as uuidv4} from 'uuid';
 import {Chat} from './model/Chat';
 import {UserService} from '../user/user.service';
-import {ChatDto} from "./chat.response";
 import {MessageService} from "../message/message.service";
 
 @Injectable()
@@ -84,8 +83,7 @@ export class ChatService {
    */
   async getChatsByEmail(email: string): Promise<Chat[]> {
     const chats = await this.getChats();
-    const myChat = chats.filter((chat) => chat.users.includes(email));
-    return myChat;
+    return chats.filter((chat) => chat.users.includes(email));
   }
 
   /**
