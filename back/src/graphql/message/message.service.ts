@@ -72,18 +72,33 @@ export class MessageService {
     }
   }
 
-  async getMessages(chatId: string): Promise<Message[]> {
+  async getMessages(chatId: string, userEmail = ''): Promise<Message[]> {
+    const chat = await this.chatService.getChatById(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    if (userEmail != '' && !chat.users.includes(userEmail)) {
+        throw new NotFoundException('User not part of chat');
+    }
     const messagesKeys = await this.redis.keys(`messages: ${chatId}:*`);
 
     if (messagesKeys.length > 0) {
       const messageData = await Promise.all(
         messagesKeys.map((key) => this.redis.get(key)),
       );
-      return messageData.map((message) => {
+      const messages: Message[] =  messageData.map((message) => {
         const parsedMessage = JSON.parse(message!);
         parsedMessage.createdAt = new Date(parsedMessage.createdAt);
         return parsedMessage;
       });
+
+      if (messages.length === 0) {
+        throw new NotFoundException('No messages found');
+      }
+
+      console.log('Messages found', messages);
+      return messages;
     } else {
       const messageDB = await this.messageRepository.find({
         where: { chatId },
@@ -91,5 +106,6 @@ export class MessageService {
       return messageDB;
     }
   }
+
 
 }

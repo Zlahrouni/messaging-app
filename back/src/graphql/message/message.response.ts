@@ -13,3 +13,15 @@ export class MessageResponse {
     @Field(() => Message, {nullable: true})
     messageCreated?: Message;
 }
+
+@ObjectType()
+export class MessagesResponse {
+    @Field()
+    code: number;
+
+    @Field()
+    message: string;
+
+    @Field(() => [Message], {defaultValue: []})
+    messages: Message[];
+}
