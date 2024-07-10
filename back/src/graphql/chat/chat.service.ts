@@ -1,12 +1,8 @@
-import {
-  ConflictException, forwardRef, Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import {ConflictException, forwardRef, Inject, Injectable, NotFoundException,} from '@nestjs/common';
 import Redis from 'ioredis';
-import { v4 as uuidv4 } from 'uuid';
-import { Chat } from './model/Chat';
-import { UserService } from '../user/user.service';
+import {v4 as uuidv4} from 'uuid';
+import {Chat} from './model/Chat';
+import {UserService} from '../user/user.service';
 import {ChatDto} from "./chat.response";
 import {MessageService} from "../message/message.service";
 
@@ -16,7 +12,7 @@ export class ChatService {
 
   constructor(
       private readonly userService: UserService, @Inject(forwardRef(() => MessageService))
-      private noteService: MessageService,) {
+      private messageService: MessageService,) {
     this.redis = new Redis({
       host: 'localhost',
       port: 6379,
@@ -86,17 +82,10 @@ export class ChatService {
    * @param email - The email of the user.
    * @returns A list of chats.
    */
-  async getChatsByEmail(email: string): Promise<ChatDto[]> {
+  async getChatsByEmail(email: string): Promise<Chat[]> {
     const chats = await this.getChats();
     const myChat = chats.filter((chat) => chat.users.includes(email));
-    return myChat.map(chat => {
-      return {
-        id: chat.id,
-        users: chat.users,
-        lastMessage: "Hello",
-        createdAt: chat.createdAt
-      }
-    });
+    return myChat;
   }
 
   /**
@@ -107,5 +96,23 @@ export class ChatService {
   async getChatByEmails(emails: string[]): Promise<Chat | undefined> {
     const chats = await this.getChats();
     return chats.find((chat) => chat.users.includes(emails[0]) && chat.users.includes(emails[1]));
+  }
+
+  async getLastMessageOfChats(chats: Chat[]): Promise<Promise<{
+    createdAt: Date;
+    lastMessage: string;
+    id: string;
+    users: string[]
+  }>[]> {
+    return chats.map(async (chat) => {
+      const messages = await this.messageService.getMessages(chat.id);
+      const lastMessage = messages[messages.length - 1];
+      return {
+        id: chat.id,
+        users: chat.users,
+        lastMessage: lastMessage.content,
+        createdAt: chat.createdAt,
+      };
+    });
   }
 }

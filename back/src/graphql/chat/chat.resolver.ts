@@ -4,12 +4,14 @@ import { ChatService } from './chat.service';
 import { GetChatsByUsernameResponse } from './chat.response';
 import { verifyOAuthToken } from '../module/auth';
 import { UserService } from '../user/user.service';
+import {MessageService} from "../message/message.service";
 
 @Resolver(() => Chat)
 export class ChatResolver {
   constructor(
     private readonly chatService: ChatService,
     private readonly userService: UserService,
+    private  readonly messageService: MessageService,
   ) {}
 
   /**
@@ -36,10 +38,13 @@ export class ChatResolver {
 
       const chats = await this.chatService.getChatsByEmail(user.email);
 
+      const chatDtos = this.chatService.getLastMessageOfChats(chats);
+
+      console.log('Chat DTOs', chatDtos)
       return {
         code: 200,
         message: 'Success',
-        chats: chats,
+        chats: chatDtos,
       };
     } catch (e) {
       return {
