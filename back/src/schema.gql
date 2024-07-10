@@ -22,7 +22,7 @@ type Chat {
   createdAt: DateTime!
 }
 
-type CreateOrSignUserResponse {
+type GetChatsByUsernameResponse {
   code: Float!
   message: String!
   chats: [Chat!]!
@@ -39,7 +39,7 @@ type GetUsersResponse {
   users: [User!]!
 }
 
-type CreateUserResponse {
+type CreateOrSignUserResponse {
   code: Float!
   message: String!
   user: User
