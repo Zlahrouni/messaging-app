@@ -15,16 +15,16 @@ export const CREATE_USER = gql`
 
 
   export const CREATE_MESSAGE = gql`
-    mutation CreateMessage($messageInput: MessageInput!) {
+    mutation createMessage($messageInput: MessageInput!) {
       createMessage(messageInput: $messageInput) {
         code
         message
-        Message{
+        Message {
           id
           senderId
           receiverId
           content
-          id_Chat
+          chatId
           createdAt
         }
       }

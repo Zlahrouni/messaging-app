@@ -18,7 +18,6 @@ initializeApp(firebaseConfig);
 
 const app = createApp({
   setup() {
-
     provide(ApolloClients, {
       default: client,
     });

@@ -187,7 +187,7 @@ export default {
     async getChat() {
       const token = localStorage.getItem('token');
 
-      
+      console.log(token)
 
       const { data: response } = await client.query({
           query: GET_CHATS, 
@@ -199,76 +199,60 @@ export default {
             this.chats.push(new_chat)
           });
         }
-        
-
-
     },
     async getUsers() {      
-
       const { data: response } = await client.query({
           query: GET_USERS
         });
-        
       let userObjectList = response.getUsers.users;
-
       userObjectList.forEach(user => 
         {
           if(user.email != this.userId){
             this.usersByEmail.push(user.email);
-          }
-            
+          }   
         }
       );
-
     },
     async sendMessage() {
       if (this.newMessage.trim() !== "" && this.userId && this.selectedChatEmail) {
         const now = new Date();
         const formattedDate = format(now, "dd/MM/yyyy HH:mm");
+        const token = localStorage.getItem('token');
 
         const messageInput = {
           content: this.newMessage,
           senderId: this.userId,
           receiverId: this.selectedChatEmail,
-          chatId: this.chatId,
+          chatId: this.chatId || null,
           createdAt: formattedDate,
+          token: token
         };
-        console.log(this.selectedChatEmail);
-        console.log("message");
-        console.log(messageInput);
-        console.log(this.messages)
-        this.messages.push(messageInput);
-        this.newMessage = "";
 
-        const { data: response } = await client.query({
-          query: CREATE_MESSAGE, 
-          variables: messageInput,
-        });
+        // try {
 
-        console.log(response);
-
-
-        try {
-          
-
-          const { mutate: createMessage } = useMutation(CREATE_MESSAGE, {
-            client: client,
+          const { response } = await client.mutate({
+            mutation: CREATE_MESSAGE, 
+            variables: { messageInput },
           });
 
-          const response = await createMessage({ message });
 
-          console.log(reponse);
-
+          console.log(response);
+          this.messages.push(messageInput);
           this.newMessage = "";
 
           this.$nextTick(() => {
             this.scrollToBottom();
           });
-        } catch (error) {
-          console.error("GraphQL error:", error);
-          this.msgErr = "Erreur lors de l'envoi du message";
-        }
+        // } catch (error) {
+        //   console.error("GraphQL error:", error);
+        //   this.msgErr = "Erreur lors de l'envoi du message";
+          
+        // }
       }
+      if(this.msgErr){
+        alert(this.msgErr);
+      }
+      
     },
     scrollToBottom() {
       const container = this.$refs.messagesContainer;
