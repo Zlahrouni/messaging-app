@@ -25,15 +25,15 @@ export class ChatService {
 
   /**
    * Creates a new chat.
-   * @param senderUsername - The username of the sender.
-   * @param receiverUsername - The username of the receiver.
    * @returns The created chat.
+   * @param senderEmail - The email of the sender.
+   * @param receiverEmail - The email of the receiver.
    * @throws NotFoundException - If the sender or receiver is not found.
    * @throws ConflictException - If the chat already exists.
    */
-  async createChat(senderUsername: string, receiverUsername: string) : Promise<Chat> {
-    const sender = await this.userService.getUserByEmail(senderUsername);
-    const receiver = await this.userService.getUserByEmail(receiverUsername);
+  async createChat(senderEmail: string, receiverEmail: string) : Promise<Chat> {
+    const sender = await this.userService.getUserByEmail(senderEmail);
+    const receiver = await this.userService.getUserByEmail(receiverEmail);
 
     if (!sender || !receiver) {
       throw new NotFoundException('Sender or receiver not found');

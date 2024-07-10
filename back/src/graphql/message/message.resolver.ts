@@ -5,6 +5,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Message } from './model/Message';
 import { verifyOAuthToken } from '../module/auth';
 import { UserService } from '../user/user.service';
+import {MessageResponse} from "./message.response";
 
 @Resolver(() => Message)
 export class MessageResolver {
@@ -15,36 +16,55 @@ export class MessageResolver {
     private readonly userService: UserService,
   ) {}
 
-  @Mutation(() => Message)
+  @Mutation(() => MessageResponse)
   async createMessage(@Args('messageInput') messageInput: MessageInput) {
-    const { token } = messageInput;
+    const { token, receiveirEmail, content } = messageInput;
     try {
-      const userEmail = await verifyOAuthToken(token);
-      if (!userEmail) {
+      const senderEmail = await verifyOAuthToken(token);
+      if (!senderEmail) {
         return {
           code: 401,
           message: 'Unauthorized',
-          chat: null,
+          messageCreated: null,
         };
       }
-      const newMessage = await this.messageService.createMessage(messageInput);
+
+      const senderUser  = await this.userService.getUserByEmail(senderEmail);
+      const receiverUser = await this.userService.getUserByEmail(receiveirEmail);
+
+      if (senderUser === null) {
+        return {
+          code: 404,
+          message: 'Sender not found',
+          messageCreated: null,
+        };
+      }
+
+        if (receiverUser === null) {
+            return {
+            code: 404,
+            message: 'Receiver not found',
+            messageCreated: null,
+            };
+        }
+      const newMessage = await this.messageService.createMessage(senderUser.email, receiverUser.email, content);
       return {
         code: 200,
         message: 'Chat created successfully',
-        newMessage,
+        messageCreated: newMessage,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
         return {
           code: 404,
           message: error.message,
-          chat: null,
+          messageCreated: null,
         };
       } else if (error instanceof ConflictException) {
         return {
           code: 409,
           message: error.message,
-          chat: null,
+          messageCreated: null,
         };
       }
 
