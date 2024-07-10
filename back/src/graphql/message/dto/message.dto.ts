@@ -16,4 +16,7 @@ export class MessageInput {
 
   @Field()
   createdAt: Date;
+
+  @Field()
+  token: string;
 }

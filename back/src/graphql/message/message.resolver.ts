@@ -3,6 +3,7 @@ import { MessageService } from './message.service';
 import { MessageInput } from './dto/message.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Message } from './model/Message';
+import { verifyOAuthToken } from '../module/auth';
 
 @Resolver(() => Message)
 export class MessageResolver {
@@ -12,11 +13,21 @@ export class MessageResolver {
 
   @Mutation(() => Message)
   async createMessage(@Args('messageInput') messageInput: MessageInput) {
+    const { token } = messageInput;
     try {
+      const userEmail = await verifyOAuthToken(token);
+      if (!userEmail) {
+        return {
+          code: 401,
+          message: 'Unauthorized',
+          chat: null,
+        };
+      }
+      const newMessage = await this.messageService.createMessage(messageInput);
       return {
         code: 200,
         message: 'Chat created successfully',
-        newmessage: await this.messageService.createMessage(messageInput),
+        newMessage,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
