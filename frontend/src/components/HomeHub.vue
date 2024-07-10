@@ -5,7 +5,9 @@
       <div>
         <div class="h1">Bienvenue dans le Hub</div>
         <div class="h6">Connecté en tant que : {{ userId }}</div>
-        <div class="h5">Chat Géneral</div>
+        <div class="h5">Chat {{ selectedChatEmail ? "avec " + selectedChatEmail : "Général" }}</div>
+
+        
         
       </div>
 
@@ -17,16 +19,29 @@
           border: 5px solid black;
           border-radius: 5px;">
             <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
-              <span class="fs-5 fw-semibold">Conversation</span>
+              <span class="fs-5 fw-semibold">Conversation </span>
+              <div class="dropdown">
+                <button class="btn btn-primary rounded-circle " 
+                  @click="toggleDropdown" :class="{ 'show': showDropdown }" type="button" id="dropdownMenuButton" aria-expanded="false">
+                  +
+                </button>
+                <ul class="dropdown-menu" :class="{ 'show': showDropdown }" aria-labelledby="dropdownMenuButton">
+                  <li v-for="email in usersByEmail" :key="email">
+                    <button class="dropdown-item" @click="createChat(email)">{{ email }}</button>
+                  </li>
+                </ul>
+              </div>
             </a>
             <div class="list-group list-group-flush border-bottom" style="overflow-y: auto; ">
               <div v-for="chat in chats" class="list-group-item list-group-item-action py-3 lh-sm">
-                <!-- <button class="d-flex w-100 align-items-center justify-content-between" @click="selectChat(chat)">
-                  {{ chat }}
-                </button> -->
-                <button class="d-flex w-100 align-items-center justify-content-between text-center"
-                        @click="selectChat(chat)">
-                  {{ chat.users.join(' ') }}
+
+                <button @click="selectChat(chat)">
+                  <div v-for="useremail in chat.users">
+                      <div class="text-center" v-if="useremail != userId">
+                        {{ useremail }}
+
+                    </div>
+                  </div>
                 </button>
               </div>
             </div>
@@ -42,7 +57,7 @@
               <div class="message-info">
                 <div>
                   <p id="user">{{ message.senderId }}</p>
-                  <p id="date">{{ message.date }}</p>
+                  <p id="date">{{ message.createdAt }}</p>
                 </div>
                 <div>
                   <p id="text">{{ message.content }}</p>
@@ -66,7 +81,7 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { format } from "date-fns";
 import { useMutation, useQuery  } from '@vue/apollo-composable';
-import { GET_CHATS } from './../graphql/queries';
+import { GET_CHATS, GET_USERS } from './../graphql/queries';
 import { CREATE_MESSAGE } from './../graphql/mutations'; 
 import client from "../apollo/client";
 
@@ -77,27 +92,28 @@ export default {
       newMessage: "",
       messages: [],
       message: null,
-      selectedChatId: null,
+      selectedChatEmail: null,
+      chatId: null,
       chats: [
-        {id: 1, users: ["Mka Videg", "inconnu1"], 
+        {id: 1, users: ["mohamedreda.kerraz@gmail.com", "inconnu1"], 
           messages: [
             {id: 1, senderId: "inconnu1", content: "yo salut", id_Chat: 1}, 
-            {id: 2, senderId: "Mka Videg", content: "sa va", id_Chat: 1}
+            {id: 2, senderId: "mohamedreda.kerraz@gmail.com", content: "sa va", id_Chat: 1}
           ]
         }, 
-        {id: 2, users: ["Mka Videg", "inconnu2"], 
+        {id: 2, users: ["mohamedreda.kerraz@gmail.com", "inconnu2"], 
           messages: [
-            {id: 1, senderId: "Mka Videg", content: "tu es la ? ", id_Chat: 2}, 
+            {id: 1, senderId: "mohamedreda.kerraz@gmail.com", content: "tu es la ? ", id_Chat: 2}, 
             {id: 2, senderId: "inconnu2", content: "oui et toi", id_Chat: 2}
           ]
         },
-        {id: 3, users: ["Mka Videg", "inconnu3"], 
+        {id: 3, users: ["mohamedreda.kerraz@gmail.com", "inconnu3"], 
           messages: [
             {id: 1, senderId: "inconnu3", content: "tu joue ?", id_Chat: 3}, 
-            {id: 2, senderId: "Mka Videg", content: "oui j'arrive", id_Chat: 3}
+            {id: 2, senderId: "mohamedreda.kerraz@gmail.com", content: "oui j'arrive", id_Chat: 3}
           ]
         }, 
-        {id: 4, users: ["Mka Videg", "inconnu4"], 
+        {id: 4, users: ["mohamedreda.kerraz@gmail.com", "inconnu4"], 
           messages: [
             {id: 1, senderId: "inconnu4",content: "tu dort ?", id_Chat: 4}, 
           ]
@@ -105,6 +121,8 @@ export default {
       ],
       userId: null,
       user: null,
+      usersByEmail: [],
+      showDropdown: false,
       token: null,
       hasMore: true,
       SERVER_PORT: import.meta.env.VITE_BACKEND_PORT || 3000,
@@ -119,7 +137,8 @@ export default {
     this.scrollToBottom();
   },
   created() {
-   this.getChat();
+    this.getUsers();
+    this.getChat();
   },
   methods: {
     initUser() {
@@ -130,17 +149,8 @@ export default {
           user.getIdToken().then((token) => {
             localStorage.setItem('token', token);
           });
-          if (user.displayName == null) {
-            const atIndex = user.email.indexOf("@");
-            if (atIndex !== -1) {
-              this.userId = user.email.substring(0, atIndex);
-            } else {
-              this.userId = "undefined";
-            }
-          } else {
-            this.userId = user.displayName;
-          }
-
+          
+          this.userId = user.email;
           this.user = user;
 
         } else {
@@ -150,55 +160,107 @@ export default {
       });
       
     },
+    toggleDropdown() {
+      this.showDropdown = !this.showDropdown;
+    },
     selectChat(chat) {
-      this.selectedChatId = chat.id;
-      console.log(chat);
-      this.messages = chat.messages;
+
+      chat.users.forEach(email => {
+        if(email != this.userId){
+          this.selectedChatEmail = email;
+        }
+      });
+
+      this.messages = chat.messages || [];
       
+    },
+    createChat(email){
+      this.showDropdown = !this.showDropdown;
+      this.selectedChatEmail = email;
+      this.chats.push(
+        { id : email,
+          users: [email]
+
+        })
     },
 
     async getChat() {
       const token = localStorage.getItem('token');
+
       
 
       const { data: response } = await client.query({
-          query: GET_CHATS,
+          query: GET_CHATS, 
           variables: { token : token },
         });
-
-      console.log(response)
-
-
-
-
+        let get_chat = response.getMyChats.chats;
+        if(get_chat.length > 0){
+          get_chat.forEach(new_chat => {
+            this.chats.push(new_chat)
+          });
+        }
+        
 
 
     },
+    async getUsers() {      
+
+      const { data: response } = await client.query({
+          query: GET_USERS
+        });
+        
+      let userObjectList = response.getUsers.users;
+
+      userObjectList.forEach(user => 
+        {
+          if(user.email != this.userId){
+            this.usersByEmail.push(user.email);
+          }
+            
+        }
+      );
+
+    },
     async sendMessage() {
-      if (this.newMessage.trim() !== "" && this.userId && this.selectedChatId) {
+      if (this.newMessage.trim() !== "" && this.userId && this.selectedChatEmail) {
         const now = new Date();
         const formattedDate = format(now, "dd/MM/yyyy HH:mm");
 
-        const message = {
+        const messageInput = {
           content: this.newMessage,
           senderId: this.userId,
-          chatId: this.selectedChatId,
-          date: formattedDate,
+          receiverId: this.selectedChatEmail,
+          chatId: this.chatId,
+          createdAt: formattedDate,
         };
-        this.messages.push(message);
+        console.log(this.selectedChatEmail);
+        console.log("message");
+        console.log(messageInput);
+        console.log(this.messages)
+        this.messages.push(messageInput);
         this.newMessage = "";
+
+        const { data: response } = await client.query({
+          query: CREATE_MESSAGE, 
+          variables: messageInput,
+        });
+
+        console.log(response);
+
+
         try {
+          
 
           const { mutate: createMessage } = useMutation(CREATE_MESSAGE, {
             client: client,
           });
 
-
           const response = await createMessage({ message });
 
- 
-         
+          console.log(reponse);
+
           this.newMessage = "";
+
           this.$nextTick(() => {
             this.scrollToBottom();
           });

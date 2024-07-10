@@ -35,8 +35,7 @@ const { mutate: createUser } = useMutation(CREATE_USER, {
 const register = () => {
   createUserWithEmailAndPassword(getAuth(), email.value, mdp.value)
     .then((result) => {
-      
-      createUser({ email: email.value })
+      createUser({ email: result.user.email })
         .then(response => {
           if(response.data.createOrSignUser.code == 200){
             console.log("Inscription réussite !");
@@ -73,7 +72,7 @@ const signInWithGoogle = () => {
   signInWithPopup(getAuth(), provider)
     .then((result) => {
 
-      createUser({ email: email.value })
+      createUser({ email: result.user.email })
         .then(response => {
           if(response.data.createOrSignUser.code == 200){
             console.log("Connexion réussite !");

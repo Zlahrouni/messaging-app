@@ -21,7 +21,7 @@ export const GET_MESSAGES = gql`
       senderId
       receiverId
       content
-      id_Chat
+      chatId
       createdAt
     }
   }
