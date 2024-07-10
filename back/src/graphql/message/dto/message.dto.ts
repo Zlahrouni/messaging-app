@@ -3,20 +3,12 @@ import { Field, InputType } from '@nestjs/graphql';
 @InputType()
 export class MessageInput {
   @Field()
-  senderId: string;
+  token: string;
 
   @Field()
-  receiverId: string;
-
-  @Field()
-  chatId: string;
+  receiveirEmail: string;
 
   @Field()
   content: string;
 
-  @Field()
-  createdAt: Date;
-
-  @Field()
-  token: string;
 }

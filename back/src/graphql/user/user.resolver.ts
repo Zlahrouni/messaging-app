@@ -1,9 +1,8 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './model/User';
-import {ConflictException} from "@nestjs/common";
-import {CreateOrSignUserResponse, GetUsersResponse} from "./user.response";
-
+import { ConflictException } from '@nestjs/common';
+import { CreateOrSignUserResponse, GetUsersResponse } from './user.response';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -18,18 +17,18 @@ export class UserResolver {
   @Mutation(() => CreateOrSignUserResponse)
   async createOrSignUser(@Args('email') email: string) {
     try {
-        return {
-          code: 200,
-          message: 'User authenticated successfully',
-          user: await this.userService.createOrSignUser(email),
-        };
+      return {
+        code: 200,
+        message: 'User authenticated successfully',
+        user: await this.userService.createOrSignUser(email),
+      };
     } catch (error) {
       if (error instanceof ConflictException) {
         return {
           code: 409,
           message: error.message,
-          user: null
-        }
+          user: null,
+        };
       }
       throw error;
     }

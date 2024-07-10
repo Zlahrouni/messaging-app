@@ -25,7 +25,14 @@ type Chat {
 type GetChatsByUsernameResponse {
   code: Float!
   message: String!
-  chats: [Chat!]!
+  chats: [ChatDto!]!
+}
+
+type ChatDto {
+  id: ID!
+  users: [String!]!
+  lastMessage: String!
+  createdAt: DateTime!
 }
 
 type User {
@@ -62,4 +69,5 @@ input MessageInput {
   chatId: String!
   content: String!
   createdAt: DateTime!
+  token: String!
 }
