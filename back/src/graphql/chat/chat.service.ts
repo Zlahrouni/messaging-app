@@ -1,5 +1,5 @@
 import {
-  ConflictException,
+  ConflictException, forwardRef, Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,12 +7,16 @@ import Redis from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 import { Chat } from './model/Chat';
 import { UserService } from '../user/user.service';
+import {ChatDto} from "./chat.response";
+import {MessageService} from "../message/message.service";
 
 @Injectable()
 export class ChatService {
   private redis: Redis;
 
-  constructor(private readonly userService: UserService) {
+  constructor(
+      private readonly userService: UserService, @Inject(forwardRef(() => MessageService))
+      private noteService: MessageService,) {
     this.redis = new Redis({
       host: 'localhost',
       port: 6379,
@@ -82,9 +86,17 @@ export class ChatService {
    * @param email - The email of the user.
    * @returns A list of chats.
    */
-  async getChatsByEmail(email: string) {
+  async getChatsByEmail(email: string): Promise<ChatDto[]> {
     const chats = await this.getChats();
-    return chats.filter((chat) => chat.users.includes(email));
+    const myChat = chats.filter((chat) => chat.users.includes(email));
+    return myChat.map(chat => {
+      return {
+        id: chat.id,
+        users: chat.users,
+        lastMessage: "Hello",
+        createdAt: chat.createdAt
+      }
+    });
   }
 
   /**

@@ -14,6 +14,9 @@ import { User } from './graphql/user/model/User';
 import { Chat } from './graphql/chat/model/Chat';
 import { UserResolver } from './graphql/user/user.resolver';
 import { UserService } from './graphql/user/user.service';
+import {ChatModule} from "./graphql/chat/chat.module";
+import { UserModule } from './graphql/user/user.module';
+import { MessageModule } from './graphql/message/message.module';
 
 @Module({
   imports: [
@@ -46,6 +49,12 @@ import { UserService } from './graphql/user/user.service';
         synchronize: true,
       }),
     }),
+    TypeOrmModule.forFeature([Chat]),
+    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Message]),
+    UserModule,
+    MessageModule,
+    ChatModule
   ],
   providers: [
     UserResolver,

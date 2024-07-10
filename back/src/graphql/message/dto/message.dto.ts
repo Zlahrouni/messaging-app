@@ -8,8 +8,8 @@ export class MessageInput {
   @Field()
   receiverId: string;
 
-  @Field()
-  chatId: string;
+  @Field(() => String, { nullable: true })
+  chatId?: string;
 
   @Field()
   content: string;
