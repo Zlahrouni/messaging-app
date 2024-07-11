@@ -62,12 +62,10 @@ const handleAuthError = (error) => {
 
 const createUser = async (sendemail) => {
   try {
-    const response = await client.mutate({
+    await client.mutate({
       mutation: CREATE_USER,
       variables: { email: sendemail },
     });
-    console.log(response);
-    console.log("Connexion réussie !");
     router.push("/hub");
   } catch (error) {
     console.error("GraphQL error:", error);

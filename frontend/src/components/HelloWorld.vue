@@ -1,22 +1,16 @@
 <script setup>
 import { ref } from 'vue'
 
-defineProps({
-  msg: String,
-})
 
-const count = ref(0)
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
-
-  <div class="card">
-
-    <p>
-      components/HelloWorld.vue
-    </p>
-  </div>
+<h1 class="text-center pt-4"> Welcome to Chat Hub</h1>
+<div class="d-flex justify-content-center pt-4">
+ 
+  <img src="../assets/img/logo.png" alt="">
+</div>
+  
 
 
 </template>

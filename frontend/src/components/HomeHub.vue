@@ -111,6 +111,7 @@ export default {
   },
   mounted() {
     this.initUser();
+    this.connect();
     this.scrollToBottom();
     
   },
@@ -203,6 +204,7 @@ export default {
       const { data: response } = await client.query({
           query: GET_USERS
         });
+      console.log(response)
       let userObjectList = response.getUsers.users;
       userObjectList.forEach(user => 
         {
@@ -256,12 +258,12 @@ export default {
       }
       this.getChat();
     },
-    connect(user) {
+    connect() {
       if (this.ws) {
         this.ws.close();
       }
       this.ws = new WebSocket(
-        `ws://localhost:3000?token=${user.accessToken}`
+        `ws://localhost:3000`
       );
 
       this.ws.onopen = (event) => {

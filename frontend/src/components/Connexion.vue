@@ -20,7 +20,6 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { useRouter } from "vue-router";
-import { useMutation } from '@vue/apollo-composable';
 import { CREATE_USER } from './../graphql/mutations'; 
 import client from "../apollo/client";
 
@@ -29,78 +28,66 @@ const mdp = ref("");
 const msgErr = ref();
 const router = useRouter();
 
-const { mutate: createUser } = useMutation(CREATE_USER, {
-    client: client
-});
 
-const login = () => {
-  signInWithEmailAndPassword(getAuth(), email.value, mdp.value)
-    .then((result) => {
 
-      createUser({ email: result.user.email })
-        .then(response => {
-          if(response.data.createOrSignUser.code == 200){
-            console.log("Inscription réussite !");
-            router.push("/hub");
-          }
-        }).catch(error => {
-          console.log(error);
-          console.error("GraphQL error:", error);
-        });
-
-    })
-    .catch((error) => {
-      switch (error.code) {
-        case "auth/invalid-email":
-          msgErr.value = "Email invalide";
-          break;
-        case "auth/user-not-found":
-          msgErr.value = "Utilisateur introuvable";
-          break;
-        case "auth/wrong-password":
-          msgErr.value = "Mot de passe incorrect";
-          break;
-        default:
-          msgErr.value = "Email ou mot de passe incorrect";
-          break;
-      }
-    });
+const login = async () => {
+  try {
+    const result = await signInWithEmailAndPassword(getAuth(), email.value, mdp.value);
+    await createUser(result.user.email);
+    console.log("Inscription réussite !");
+    router.push("/hub");
+  } catch (error) {
+    handleAuthError(error);
+  }
 };
 
-const signInWithGoogle = () => {
+
+const createUser = async (sendemail) => {
+  try {
+    await client.mutate({
+      mutation: CREATE_USER,
+      variables: { email: sendemail },
+    });
+    router.push("/hub");
+  } catch (error) {
+    console.error("GraphQL error:", error);
+    handleGraphQLError(error);
+  }
+};
+
+
+const handleGraphQLError = (error) => {
+  console.error("GraphQL error:", error);
+};
+
+const handleAuthError = (error) => {
+  switch (error.code) {
+    case "auth/invalid-email":
+      msgErr.value = "Email invalide";
+      break;
+    case "auth/user-not-found":
+      msgErr.value = "Utilisateur introuvable";
+      break;
+    case "auth/wrong-password":
+      msgErr.value = "Mot de passe incorrect";
+      break;
+    default:
+      msgErr.value = "Email ou mot de passe incorrect";
+      break;
+  }
+};
+
+
+const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
-
-  signInWithPopup(getAuth(), provider)
-    .then((result) => {
-
-      createUser({ email: result.user.email  })
-        .then(response => {
-          console.log(response);
-          if(response.data.createOrSignUser.code == 200){
-            console.log("Inscription réussite !");
-            router.push("/hub");
-          }
-        }).catch(error => {
-          console.log(error);
-          console.error("GraphQL error:", error);
-        });
-
-    })
-    .catch((error) => {
-      switch (error.code) {
-        case "auth/invalid-email":
-          msgErr.value = "Email invalide";
-          break;
-        case "auth/user-not-found":
-          msgErr.value = "Utilisateur introuvable";
-          break;
-        case "auth/wrong-password":
-          msgErr.value = "Mot de passe incorrect";
-          break;
-        default:
-          msgErr.value = "Email ou mot de passe incorrect";
-          break;
-      }
-    });
+  try {
+    const result = await signInWithPopup(getAuth(), provider);
+    await createUser(result.user.email);
+  } catch (error) {
+    handleAuthError(error);
+  }
 };
+
+
+
 </script>
