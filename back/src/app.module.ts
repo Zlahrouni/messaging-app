@@ -14,9 +14,12 @@ import { User } from './graphql/user/model/User';
 import { Chat } from './graphql/chat/model/Chat';
 import { UserResolver } from './graphql/user/user.resolver';
 import { UserService } from './graphql/user/user.service';
-import {ChatModule} from "./graphql/chat/chat.module";
+import { ChatModule } from './graphql/chat/chat.module';
 import { UserModule } from './graphql/user/user.module';
 import { MessageModule } from './graphql/message/message.module';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
@@ -40,11 +43,11 @@ import { MessageModule } from './graphql/message/message.module';
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
-        host: 'localhost',
+        host: process.env.DATABASE_HOST,
         port: 5432,
-        username: 'admin',
-        password: 'admin',
-        database: 'webprojectdb',
+        username: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE_NAME,
         entities: [User, Message, Chat],
         synchronize: true,
       }),
@@ -54,7 +57,7 @@ import { MessageModule } from './graphql/message/message.module';
     TypeOrmModule.forFeature([Message]),
     UserModule,
     MessageModule,
-    ChatModule
+    ChatModule,
   ],
   providers: [
     UserResolver,

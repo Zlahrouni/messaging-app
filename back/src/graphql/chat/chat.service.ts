@@ -31,11 +31,16 @@ export class ChatService {
   }
 
   /**
-   * Creates a new chat.
+   * Creates a new chat in Redis cache and the database.
+   *
    * @returns The created chat.
+   *
    * @param senderEmail - The email of the sender.
+   *
    * @param receiverEmail - The email of the receiver.
+   *
    * @throws NotFoundException - If the sender or receiver is not found.
+   *
    * @throws ConflictException - If the chat already exists.
    */
   async createChat(senderEmail: string, receiverEmail: string): Promise<Chat> {
@@ -66,7 +71,10 @@ export class ChatService {
   }
 
   /**
-   * Retrieves all chats.
+   * Retrieves all chats from the Redis cache and the database.
+   *
+   * @throws NotFoundException - If chats array is empty no chats are found.
+   *
    * @returns A list of chats.
    */
   async getChats() {
@@ -89,14 +97,15 @@ export class ChatService {
       return chats;
     } else {
       const chatsDB = await this.chatRepository.find();
-      console.log('savedChats', chatsDB);
       return chatsDB;
     }
   }
 
   /**
-   * Retrieves a chat by ID.
+   * Retrieves a chat by ID from Redis cache and the database.
+   *
    * @param chatId - The ID of the chat.
+   *
    * @returns The chat.
    */
   async getChatById(chatId: string) {
@@ -114,7 +123,9 @@ export class ChatService {
 
   /**
    * Retrieves chats by username.
+   *
    * @param email - The email of the user.
+   *
    * @returns A list of chats.
    */
   async getChatsByEmail(email: string): Promise<Chat[]> {
@@ -124,7 +135,9 @@ export class ChatService {
 
   /**
    * Retrieves a chat by usernames.
+   *
    * @param emails - The emails of the users.
+   *
    * @returns The chat or undefined.
    */
   async getChatByEmails(emails: string[]): Promise<Chat | undefined> {
@@ -134,6 +147,14 @@ export class ChatService {
         chat.users.includes(emails[0]) && chat.users.includes(emails[1]),
     );
   }
+
+  /**
+   * Retrieves the last message of chats.
+   *
+   * @param chats - The chats.
+   *
+   * @returns A list of promises.
+   */
 
   async getLastMessageOfChats(chats: Chat[]): Promise<
     Promise<{
