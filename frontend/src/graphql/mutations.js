@@ -5,13 +5,14 @@ export const CREATE_USER = gql`
     createOrSignUser(email: $email) {
       code
       message
-      user{
+      user {
         email
         createdAt
       }
     }
   }
 `;
+
 
 
   export const CREATE_MESSAGE = gql`

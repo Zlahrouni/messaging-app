@@ -29,20 +29,24 @@
                   <li v-for="email in usersByEmail" :key="email">
                     <button class="dropdown-item" @click="createChat(email)">{{ email }}</button>
                   </li>
+                  <div class="text-center" v-if="usersByEmail.length === 0">
+                    User not found
+                  </div>
+
                 </ul>
               </div>
             </a>
             <div class="list-group list-group-flush border-bottom" style="overflow-y: auto; ">
               <div v-for="chat in chats" class="list-group-item list-group-item-action py-3 lh-sm">
-
-                <button @click="selectChat(chat)">
-                  <div v-for="useremail in chat.users">
-                      <div class="text-center" v-if="useremail != userId">
-                        {{ useremail || "No user foundS" }}
-
+                
+                <button @click="selectChat(chat)" class="bg-dark">
+                  <div v-for="useremail in chat.users" :key="useremail">
+                    <div class="text-center" v-if="useremail !== userId">
+                      {{ useremail }}
                     </div>
                   </div>
                 </button>
+                
               </div>
             </div>
           </div>
@@ -70,8 +74,8 @@
       </div>
       
       <div>
-        <textarea autofocus placeholder="Message" v-model="newMessage" @keyup.enter="sendMessage"></textarea>
-        <button ref="scrollContainer" @click="sendMessage">Envoyer</button>
+        <textarea autofocus placeholder="Message" v-model="newMessage" @keyup.enter="postMessage"></textarea>
+        <button ref="scrollContainer" @click="postMessage">Envoyer</button>
       </div>
     </div>
   </div>
@@ -147,8 +151,6 @@ export default {
           this.selectedChatEmail = email;
         }
       });
-
-
       
       this.getMessages(chat.id);
       this.messages = chat.messages || [];
@@ -188,7 +190,6 @@ export default {
           chatId: chatId
         };
 
-      console.log(getMessage)
       const response = await client.query({
           query: GET_MESSAGES, 
           variables: {getMessage},
@@ -197,7 +198,8 @@ export default {
       this.messages = response.data.getMessages.messages;
 
     },
-    async getUsers() {      
+    async getUsers() {
+    
       const { data: response } = await client.query({
           query: GET_USERS
         });
@@ -210,7 +212,7 @@ export default {
         }
       );
     },
-    async sendMessage() {
+    async postMessage() {
       if (this.newMessage.trim() !== "" && this.userId && this.selectedChatEmail) {
  
         const token = localStorage.getItem('token');
@@ -253,6 +255,32 @@ export default {
         alert(this.msgErr);
       }
       this.getChat();
+    },
+    connect(user) {
+      if (this.ws) {
+        this.ws.close();
+      }
+      this.ws = new WebSocket(
+        `ws://localhost:3000?token=${user.accessToken}`
+      );
+
+      this.ws.onopen = (event) => {
+        console.log("Connected", event);
+      };
+
+      this.ws.onmessage = (event) => {
+        console.log("Message received:", event.data);
+        this.message = JSON.parse(event.data);
+        this.messages.push(this.message);
+      };
+
+      this.ws.onerror = (error) => {
+        console.error("WebSocket Error:", error);
+      };
+
+      this.ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
     },
     scrollToBottom() {
       const container = this.$refs.messagesContainer;
