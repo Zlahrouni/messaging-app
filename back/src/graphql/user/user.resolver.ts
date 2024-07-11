@@ -17,11 +17,20 @@ export class UserResolver {
   @Mutation(() => CreateOrSignUserResponse)
   async createOrSignUser(@Args('email') email: string) {
     try {
-      return {
-        code: 200,
-        message: 'User authenticated successfully',
-        user: await this.userService.createOrSignUser(email),
-      };
+      const createdUser = await this.userService.createOrSignUser(email);
+      if (createdUser) {
+        return {
+          code: 201,
+          message: 'User created',
+          user: createdUser,
+        };
+      } else {
+        return {
+          code: 500,
+          message: 'Internal server error',
+          user: null,
+        };
+      }
     } catch (error) {
       if (error instanceof ConflictException) {
         return {
