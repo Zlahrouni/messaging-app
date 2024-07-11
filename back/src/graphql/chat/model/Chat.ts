@@ -1,19 +1,19 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Message } from 'src/graphql/message/model/Message';
-import { User } from 'src/graphql/user/model/User';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-
+@Entity()
 @ObjectType()
 export class Chat {
   @Field(() => ID)
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Field(() => [User])
-  users: User[];
+  @Field(() => [String], { nullable: false })
+  @Column('text', { array: true })
+  users: string[];
 
   @Field()
+  @Column({ default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
-  @Field(() => [Message])
-  messages: Message[];
 }

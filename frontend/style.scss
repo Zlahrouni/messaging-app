@@ -1,0 +1,208 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+
+:root[data-theme="light"] {
+  --text: #0a0524;
+  --background: #d0cbf6;
+  --primary: #1b1174;
+  --secondary: #7581eb;
+  --accent: #cd461d;
+}
+:root[data-theme="dark"] {
+  --text: #e1dcfa;
+  --background: #0f0935;
+  --primary: #948aee;
+  --secondary: #8347d6;
+  --accent: #e25d33;
+}
+
+
+* {
+  font-family: "Quicksand";
+  font-weight: 400;
+  list-style: none;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+body {
+  height: 100dvh;
+  overflow-y: hidden;
+  background: var(--background);
+  color: var(--text);
+}
+
+#app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 5% 95%;
+}
+
+nav {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ul {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .ul-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  i {
+    color: var(--text);
+  }
+
+  li,
+  a {
+    cursor: pointer;
+    color: var(--text);
+    font-weight: bold;
+  }
+
+  li:hover,
+  a:hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+}
+
+.view-login-container,
+.view-livechat-container {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 20%;
+  justify-content: center;
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 3rem;
+}
+
+button {
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--background);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  width: 100%;
+
+  &:hover {
+    box-shadow: 0 0 1rem var(--accent);
+    scale: 1.01;
+  }
+}
+
+input[type="text"],
+input[type="password"] {
+  border: 1px solid var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--text);
+  width: 100%;
+  font-weight: 500;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.livechat-container {
+  display: grid;
+  gap: 3rem;
+  width: 50%;
+
+
+  textarea {
+    resize: none;
+    height: 2.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    border-radius: 0.4rem;
+    border: none;
+    outline: none;
+    background: var(--text);
+    color: var(--background);
+  }
+}
+
+.messages-container {
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  background: var(--text);
+  color: var(--background);
+  overflow-y: scroll;
+  height: 50dvh;
+  border-radius: 0.4rem;
+  padding: 1rem;
+
+  .message {
+    display: flex;
+  }
+
+  .message-left {
+    text-align: left;
+    justify-content: left;
+  }
+
+  .message-right {
+    text-align: right;
+    justify-content: right;
+  }
+
+  .message-info {
+    padding: 0.25rem 0.5rem;
+    color: var(--background);
+    background: var(--secondary);
+    border-radius: 0.4rem;
+  }
+}
+
+#user {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+#date {
+  font-weight: 100;
+  font-size: 0.7rem;
+}
+
+#text {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
+

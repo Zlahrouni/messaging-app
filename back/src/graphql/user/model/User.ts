@@ -1,16 +1,14 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import {Field, GraphQLISODateTime, ID, ObjectType} from '@nestjs/graphql';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+@Entity()
 @ObjectType()
 export class User {
-  @Field(() => ID)
-  id: string;
+  @Field(() => String)
+  @PrimaryColumn()
+  email: string;
 
-  @Field()
-  username: string;
-
-  @Field()
-  password: string;
-
-  @Field()
+  @Field(() => GraphQLISODateTime)
+  @Column({ default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 }
