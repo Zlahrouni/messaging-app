@@ -2,12 +2,9 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Message {
+type Chat {
   id: ID!
-  senderId: ID!
-  receiverId: ID!
-  content: String!
-  chatId: String!
+  users: [String!]!
   createdAt: DateTime!
 }
 
@@ -16,10 +13,30 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Chat {
-  id: ID!
-  users: [String!]!
+type User {
+  email: String!
   createdAt: DateTime!
+}
+
+type Message {
+  id: ID!
+  senderEmail: ID!
+  receiverEmail: ID!
+  content: String!
+  chatId: String!
+  createdAt: DateTime!
+}
+
+type MessageResponse {
+  code: Float!
+  message: String!
+  messageCreated: Message
+}
+
+type MessagesResponse {
+  code: Float!
+  message: String!
+  messages: [Message!]!
 }
 
 type GetChatsByUsernameResponse {
@@ -32,11 +49,6 @@ type ChatDto {
   id: ID!
   users: [String!]!
   lastMessage: String!
-  createdAt: DateTime!
-}
-
-type User {
-  email: String!
   createdAt: DateTime!
 }
 
@@ -54,20 +66,22 @@ type CreateOrSignUserResponse {
 
 type Query {
   getUsers: GetUsersResponse!
-  getMessages: [Message!]!
+  getMessages(getMessage: GetMessage!): MessagesResponse!
   getMyChats(token: String!): GetChatsByUsernameResponse!
+}
+
+input GetMessage {
+  token: String!
+  chatId: String!
 }
 
 type Mutation {
   createOrSignUser(email: String!): CreateOrSignUserResponse!
-  createMessage(messageInput: MessageInput!): Message!
+  createMessage(messageInput: MessageInput!): MessageResponse!
 }
 
 input MessageInput {
-  senderId: String!
-  receiverId: String!
-  chatId: String!
-  content: String!
-  createdAt: DateTime!
   token: String!
+  receiveirEmail: String!
+  content: String!
 }
