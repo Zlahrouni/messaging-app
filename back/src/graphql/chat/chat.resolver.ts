@@ -4,20 +4,22 @@ import { ChatService } from './chat.service';
 import { GetChatsByUsernameResponse } from './chat.response';
 import { verifyOAuthToken } from '../module/auth';
 import { UserService } from '../user/user.service';
-import {MessageService} from "../message/message.service";
+import { MessageService } from '../message/message.service';
 
 @Resolver(() => Chat)
 export class ChatResolver {
   constructor(
     private readonly chatService: ChatService,
     private readonly userService: UserService,
-    private  readonly messageService: MessageService,
+    private readonly messageService: MessageService,
   ) {}
 
   /**
    *  Retreives all chats for a user.
+   *
    *  @param token - The token of the user.
-   * @returns A response with a status code, message, and a list of chats (nullable).
+   *
+   *  @returns A response with a status code, message, and a list of chats (nullable).
    */
   @Query(() => GetChatsByUsernameResponse)
   async getMyChats(@Args('token') token: string) {
@@ -40,7 +42,6 @@ export class ChatResolver {
 
       const chatDtos = await this.chatService.getLastMessageOfChats(chats);
 
-      console.log('Chat DTOs', chatDtos)
       return {
         code: 200,
         message: 'Success',
