@@ -11,8 +11,9 @@ export class UserResolver {
   /**
    * Creates a new user.
    *
-   * @returns A response with a status code, message, and the created user (nullable).
    * @param email - The email of the user.
+   *
+   * @returns A response with a status code, message, and the created user (nullable).
    */
   @Mutation(() => CreateOrSignUserResponse)
   async createOrSignUser(@Args('email') email: string) {
@@ -47,8 +48,6 @@ export class UserResolver {
    * Retrieves all users.
    *
    * @returns A response with a status code, message, and a list of users (nullable).
-   *
-   * DEV NOTE: This method return also password hashable, so you need to retreive only username and id.
    */
   @Query(() => GetUsersResponse)
   async getUsers(): Promise<GetUsersResponse> {
