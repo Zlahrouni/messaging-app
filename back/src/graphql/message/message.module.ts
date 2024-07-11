@@ -8,9 +8,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './model/Message';
 import { MessageResolver } from './message.resolver';
 import { User } from '../user/model/User';
+import { Chat } from '../chat/model/Chat';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Chat]),
     TypeOrmModule.forFeature([Message]),
     TypeOrmModule.forFeature([User]),
     forwardRef(() => ChatModule),

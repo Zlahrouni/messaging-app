@@ -1,4 +1,8 @@
-import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { MessageInput } from './dto/message.dto';
 import { Queue } from 'bull';
@@ -8,8 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Message } from './model/Message';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Chat } from '../chat/model/Chat';
-import {verifyOAuthToken} from "../module/auth";
+import { verifyOAuthToken } from '../module/auth';
 
 @Injectable()
 export class MessageService {
@@ -27,20 +30,30 @@ export class MessageService {
     });
   }
 
-  async createMessage(senderEmail: string, receiveirEmail: string, content: string) {
+  async createMessage(
+    senderEmail: string,
+    receiveirEmail: string,
+    content: string,
+  ) {
     let chatId: string;
 
     if (senderEmail === receiveirEmail) {
-        throw new ConflictException('Cannot send message to yourself');
+      throw new ConflictException('Cannot send message to yourself');
     }
 
-    const chat = await this.chatService.getChatByEmails([senderEmail, receiveirEmail]);
+    const chat = await this.chatService.getChatByEmails([
+      senderEmail,
+      receiveirEmail,
+    ]);
 
     if (chat) {
-        chatId = chat.id;
+      chatId = chat.id;
     } else {
-      const chatCreated = await this.chatService.createChat(senderEmail, receiveirEmail);
-      chatId = chatCreated.id
+      const chatCreated = await this.chatService.createChat(
+        senderEmail,
+        receiveirEmail,
+      );
+      chatId = chatCreated.id;
     }
     const newMessage: Message = {
       id: uuidv4(),
@@ -55,7 +68,8 @@ export class MessageService {
     const job = await this.messageSend.add('newMessage', newMessage);
     console.log(`Message added to queue: ${job.id}`);
 
-    await this.messageRepository.save(newMessage);
+    const savedMessage = await this.messageRepository.save(newMessage);
+    console.log('Message saved in DB', savedMessage);
     await this.redis.set(`messages:${newMessage}`, JSON.stringify(newMessage));
     return newMessage;
   }
@@ -63,9 +77,9 @@ export class MessageService {
   async processNewMessage(data: MessageInput) {
     try {
       const { content, token, receiveirEmail } = data;
-      const email  = await verifyOAuthToken(token);
+      const email = await verifyOAuthToken(token);
       console.log(
-          `New message sent : ${content}, from: ${email} to ${receiveirEmail}`,
+        `New message sent : ${content}, from: ${email} to ${receiveirEmail}`,
       );
     } catch (error) {
       console.error('Error processing new message', error);
@@ -79,7 +93,7 @@ export class MessageService {
     }
 
     if (userEmail != '' && !chat.users.includes(userEmail)) {
-        throw new NotFoundException('User not part of chat');
+      throw new NotFoundException('User not part of chat');
     }
     const messagesKeys = await this.redis.keys(`messages: ${chatId}:*`);
 
@@ -87,7 +101,7 @@ export class MessageService {
       const messageData = await Promise.all(
         messagesKeys.map((key) => this.redis.get(key)),
       );
-      const messages: Message[] =  messageData.map((message) => {
+      const messages: Message[] = messageData.map((message) => {
         const parsedMessage = JSON.parse(message!);
         parsedMessage.createdAt = new Date(parsedMessage.createdAt);
         return parsedMessage;
@@ -106,6 +120,4 @@ export class MessageService {
       return messageDB;
     }
   }
-
-
 }

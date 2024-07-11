@@ -35,9 +35,12 @@ export class UserService {
       email: email,
       createdAt: new Date(),
     };
-    await this.userRepository.save(newUser);
+    const userSavedDB = await this.userRepository.save(newUser);
+
+    if (userSavedDB) {
+      return userSavedDB;
+    }
     await this.redis.set(`users:${newUser.email}`, JSON.stringify(newUser));
-    console.log('this.redis', this.redis.get(`users:${newUser.email}`));
     return newUser;
   }
 
@@ -62,22 +65,11 @@ export class UserService {
    * @returns The user with the given email or null if no user was found.
    */
   async getUserByEmail(email: string): Promise<User | null> {
-    const users = await this.redis.keys('users:*');
-
-    if (users.length > 0) {
-      const userData = await Promise.all(
-        users.map((key) => this.redis.get(key)),
-      );
-      const user = userData.find((user) => {
-        const parsedUser: User = JSON.parse(user!);
-        return parsedUser.email === email;
-      });
-      return user ? JSON.parse(user) : null;
-    } else {
-      const usersDB = await this.userRepository.find({
-        where: { email },
-      });
-      return usersDB.length > 0 ? usersDB[0] : null;
-    }
+    //const users = await this.redis.keys('users:*');
+    const usersDB = await this.userRepository.find({
+      where: { email },
+    });
+    console.log(usersDB);
+    return usersDB.length > 0 ? usersDB[0] : null;
   }
 }
